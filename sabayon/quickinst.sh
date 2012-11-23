@@ -1,7 +1,7 @@
 #!/bin/sh
 #
 # quickinst.sh
-# Sabayon non-interactive install-to-chroot script
+# Rogentos non-interactive install-to-chroot script
 #
 # Copyright (C) 2012 Fabio Erculiani
 #
@@ -21,7 +21,7 @@
 
 ## Global variables
 # Live Image default user name
-LIVE_USER="${LIVE_USER:-sabayonuser}"
+LIVE_USER="${LIVE_USER:-rogentosuser}"
 # NetworkManager networking? "1" for Yes, "0" for No
 NM_NETWORK="${NM_NETWORK:-1}"
 # Sabayon Media Center mode? "1" for Yes, "0" for No
@@ -131,8 +131,8 @@ configure_skel() {
     done
 
     # Install welcome loader
-    local welcome_name="sabayon-welcome-loader.desktop"
-    local welcome_desktop="${_chroot}/etc/sabayon/${welcome_name}"
+    local welcome_name="rogentos-welcome-loader.desktop"
+    local welcome_desktop="${_chroot}/etc/rogentos/${welcome_name}"
     if [ -f "${wecome_desktop}" ]; then
         cp -p "${welcome_desktop}" "${_autost_dir}/${welcome_name}" \
             || return ${?}
@@ -268,7 +268,7 @@ setup_sudo() {
     if [ -f "${chroot_sudo_file}" ]; then
         sed -i "/NOPASSWD/ s/^#/" "${chroot_sudo_file}" || return ${?}
         echo >> "${chroot_sudo_file}" || return ${?}
-        echo "# Added by Sabayon Alt Installer" \
+        echo "# Added by Rogentos Alt Installer" \
             >> "${chroot_sudo_file}" || return ${?}
         echo "%wheel  ALL=ALL" \
             >> "${chroot_sudo_file}" || return ${?}
@@ -309,7 +309,7 @@ _remove_proprietary_drivers() {
         # (<3.6.0 kernel) since CONFIG_DRM_RADEON_KMS=n on our kernel
         # we need to force radeon to load at boot
         echo >> "${chroot_mod_conf}" || return ${?}
-        echo "# Added by the Sabayon Installer to force radeon.ko load" \
+        echo "# Added by the Rogentos Installer to force radeon.ko load" \
             >> "${chroot_mod_conf}" || return ${?}
         echo "# since CONFIG_DRM_RADEON_KMS is not enabled by default at" \
             >> "${chroot_mod_conf}" || return ${?}
@@ -470,7 +470,7 @@ setup_services() {
         "installer-gui"
         "installer-text"
         "music"
-        "sabayonlive"
+        "rogentoslive"
     )
     local srv=
     for srv in "${srvs[@]}"; do
