@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #
 # quickinst.sh
 # Rogentos non-interactive install-to-chroot script
@@ -20,15 +20,25 @@
 #
 
 ## Global variables
-# Live Image default user name
-LIVE_USER="${LIVE_USER:-rogentosuser}"
+# User name on installed system
+QUSER=${QUSER:-geek}
+# User's password on installed system
+QUSER_PASS=${QUSER_PASS:-geek}
+# Root's password on installed system
+QROOT_PASS=${QROOT_PASS:-keeg}
 # NetworkManager networking? "1" for Yes, "0" for No
 NM_NETWORK="${NM_NETWORK:-1}"
 # Sabayon Media Center mode? "1" for Yes, "0" for No
 SABAYON_MCE="${SABAYON_MCE:-0}"
 # Firewall configuration, enable firewall? "1" for Yes, "0" for No
 FIREWALL="${FIREWALL:-1}"
-FIREWALL_PACKAGE="net-firewall/ufw"
+
+## Global variables that one wouldn't normally want to modify
+# Live Image default user name
+LIVE_USER="${LIVE_USER:-rogentosuser}"
+# Source path - where to copy data from
+SRCROOT=${SRCROOT:-/mnt/livecd}
+# Name of the firewall service
 FIREWALL_SERVICE="ufw"
 
 # This function prints a separator line
@@ -107,12 +117,8 @@ configure_skel() {
     local _desktop_dir="${_skel_dir}/Desktop"
     local _autost_dir="${_desktop_dir}/.config/autostart"
 
-    if [ ! -d "${_desktop_dir}" ]; then
-        mkdir -p "${_desktop_dir}" || return ${?}
-    fi
-    if [ ! -d "${_autost_dir}" ]; then
-        mkdir -p "${_autost_dir}" || return ${?}
-    fi
+    mkdir -p "${_desktop_dir}" || return ${?}
+    mkdir -p "${_autost_dir}" || return ${?}
 
     # Setup Rigo
     local rigo_name="rigo.desktop"
@@ -126,6 +132,7 @@ configure_skel() {
 
     # Cleanup cruft
     local cruft_desktops="gparted liveinst"
+    local cruft
     for cruft in ${cruft_desktops}; do
         rm -f "${_skel_dir}/Desktop/${cruft}.desktop"
     done
@@ -133,7 +140,7 @@ configure_skel() {
     # Install welcome loader
     local welcome_name="rogentos-welcome-loader.desktop"
     local welcome_desktop="${_chroot}/etc/rogentos/${welcome_name}"
-    if [ -f "${wecome_desktop}" ]; then
+    if [ -f "${welcome_desktop}" ]; then
         cp -p "${welcome_desktop}" "${_autost_dir}/${welcome_name}" \
             || return ${?}
     fi
@@ -178,6 +185,7 @@ setup_language() {
         libc_locale="${_lang/@*}"
 
         local valid_locales=()
+        local loc
         while read loc; do
             if [[ "${loc}" == ${libc_locale}* ]]; then
                 valid_locales+=( "${loc}" )
@@ -199,6 +207,7 @@ setup_language() {
     fi
 
     # Setup LibreOffice (openoffice...) and other DEs languages
+    local opt
     for opt in kde openoffice mozilla; do
         exec_chroot "${_chroot}" /sbin/language-setup \
             "${_lang/.*}" "${opt}"  &> /dev/null  # ignore failure
@@ -251,6 +260,7 @@ setup_keyboard() {
     fi
 
     # run keyboard-setup directly inside chroot
+    local opt
     for opt in e17 gnome kde lxde system xfce xorg; do
         exec_chroot "${_chroot}" /sbin/keyboard-setup-2 \
             "${_key_map}" "${opt}"  &>/dev/null  # ignore failure
@@ -266,7 +276,7 @@ setup_sudo() {
     local _sudo_file="/etc/sudoers"
     local chroot_sudo_file="${_chroot}/${_sudo_file}"
     if [ -f "${chroot_sudo_file}" ]; then
-        sed -i "/NOPASSWD/ s/^#/" "${chroot_sudo_file}" || return ${?}
+        sed -i "/NOPASSWD/ s/^#//" "${chroot_sudo_file}" || return ${?}
         echo >> "${chroot_sudo_file}" || return ${?}
         echo "# Added by Rogentos Alt Installer" \
             >> "${chroot_sudo_file}" || return ${?}
@@ -296,10 +306,12 @@ _remove_proprietary_drivers() {
             "x11-drivers/nvidia-userspace"
         )
 
+        local gl_path
         for gl_path in "${gl_paths[@]}"; do
             rm -rf "${_chroot}/${gl_path}"
         done
-        exec_chroot equo remove "${prop_packages[@]}" || return ${?}
+        exec_chroot "${_chroot}" \
+            equo remove "${prop_packages[@]}" || return ${?}
     fi
 
     local _mod_conf="/etc/conf.d/modules"
@@ -354,6 +366,8 @@ _setup_nvidia_legacy() {
     )
     local nvidia_pkg_files=()
     local drv_file_name=
+
+    local drv_file pkg_file
     for drv_file in "${drivers_dir}"/*; do
         drv_file_name=$(basename "${drv_file}")
 
@@ -366,6 +380,8 @@ _setup_nvidia_legacy() {
 
     local nvidia_file_name=
     local tmp_pkg_file=
+
+    local nvidia_pkg_file
     for nvidia_pkg_file in "${nvidia_pkg_files[@]}"; do
         nvidia_file_name=$(basename "${nvidia_pkg_file}")
         tmp_pkg_file="/tmp/${nvidia_file_name}"
@@ -426,9 +442,7 @@ setup_xorg() {
     local chroot_xorg_file_dir="$(dirname "${chroot_xorg_file}")"
 
     if [ -f "${_xorg_file}" ]; then
-        if [ ! -d "${chroot_xorg_file_dir}" ]; then
-            mkdir -p "${chroot_xorg_file_dir}" || return ${?}
-        fi
+        mkdir -p "${chroot_xorg_file_dir}" || return ${?}
         cat "${_xorg_file}" > "${chroot_xorg_file}" || return ${?}
         cp -p "${chroot_xorg_file}" "${chroot_xorg_file}.original" \
             || return ${?}
@@ -454,9 +468,7 @@ setup_audio() {
 
         chroot_state_file="${_chroot}/${state_file}"
         chroot_state_dir=$(dirname "${chroot_state_file}")
-        if [ ! -d "${chroot_state_dir}" ]; then
-            mkdir -p "${chroot_state_dir}" || return ${?}
-        fi
+        mkdir -p "${chroot_state_dir}" || return ${?}
         cat "${state_file}" > "${chroot_state_file}" || return ${?}
     done
 }
@@ -587,7 +599,7 @@ setup_misc() {
     exec_chroot "${_chroot}" /sbin/ldconfig
 
     # Fix a possible /tmp problem
-    chmod a+w "${_chroot}/tmp"
+    chmod a+w,o+t "${_chroot}/tmp"
     # make sure we have .keep files around
     # this was an old Entropy bug.
     mkdir -p "${_chroot}/var/tmp"
@@ -631,12 +643,13 @@ main() {
     local _chroot="${1}"
     # Overridable env vars
     # TODO(lxnay): input validation
-    local _srcroot="${SRCROOT:-/mnt/livecd}"
-    local _user="${QUSER:-geek}"
-    local _user_pass="${QUSER_PASS:-geek}"
-    local _root_pass="${QROOT_PASS:-keeg}"
+    local _srcroot="${SRCROOT}"
+    local _user="${QUSER}"
+    local _user_pass="${QUSER_PASS}"
+    local _root_pass="${QROOT_PASS}"
 
     # Input validation
+    local _dir
     for _dir in "${_chroot}" "${_srcroot}"; do
         if [ ! -d "${_dir}" ]; then
             echo "${_dir} is not a directory" >&2
@@ -706,3 +719,5 @@ main() {
 }
 
 main "${@}" || exit ${?}
+
+# vim: expandtab
