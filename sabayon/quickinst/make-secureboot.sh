@@ -22,7 +22,7 @@ openssl req -batch \
 	-new -x509 -newkey rsa:2048 -nodes \
 	-keyout "${PRIVATE_KEY}" -out "${PUBLIC_x509}" \
 	-days $((365 * 50)) \
-	-subj "/CN=Sabayon User/" || exit 1
+	-subj "/CN=Kogaion User/" || exit 1
 
 # now transform PUBLIC_x509 in binary DER format
 openssl x509 -in "${PUBLIC_x509}" -out "${PUBLIC_DER}" -outform DER || exit 1
@@ -31,4 +31,4 @@ mv "${PRIVATE_KEY}".less "${PRIVATE_KEY}" || exit 1
 
 chmod 400 "${PRIVATE_KEY}" || exit 1
 
-echo "The SecureBoot Sabayon User certificate is ${PUBLIC_DER}, enjoy"
+echo "The SecureBoot Kogaion User certificate is ${PUBLIC_DER}, enjoy"
