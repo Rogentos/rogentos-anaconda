@@ -42,6 +42,9 @@ LIVE_USER="${LIVE_USER:-rogentosuser}"
 SRCROOT=${SRCROOT:-/mnt/livecd}
 # Name of the firewall service
 FIREWALL_SERVICE="ufw"
+# If source is a running system (otherwise it can be for example a mounted
+# squashfs image) - "1" for yes, "0" for no
+SOURCE_IS_LIVE_SYSTEM="1"
 
 # This function prints a separator line
 separator() {
@@ -49,8 +52,32 @@ separator() {
 }
 
 # Print message on standard error
+# Signature: warn <message>
 warn() {
     echo "$*" >&2
+}
+
+# Inform about a failure (for exit status taken as parameter) and optionally
+# with -v about success, optionally with label; returns given status
+# Signature: inform_status [-v] <exit status> [label]
+inform_status() {
+    local verbose=0
+    local status=${1}
+    if [[ ${status} = -v ]]; then
+        verbose=1
+        shift
+        status=${1}
+    fi
+    local label=${2}
+    [[ -n ${label} ]] && label="${label}: "
+
+    if [[ ${status} -eq 0 ]]; then
+        [[ ${verbose} = 1 ]] && echo "${label}OK"
+    else
+        echo "${label}FAIL; exit status is ${status}"
+    fi
+
+    return ${status}
 }
 
 # Returns 0 if directory is empty, otherwise (non empty, not a directory,
@@ -66,6 +93,29 @@ is_empty_dir() {
     )
 }
 
+# Returns 0 if package is installed on system, 1 otherwise, 2 on error
+# <package name> can be any value accepted by equo match (it can contain
+# version string for example)
+# Signature: is_package_installed <chroot path> <package name>
+is_package_installed() {
+    local _chroot=${1}
+    local pkg=${2}
+
+    if [[ $# -ne 2 ]]; then
+        warn "ERROR: is_package_installed required 2 arguments - $# given"
+        return 2
+    fi
+
+    local output
+    output=$( exec_chroot "${_chroot}" \
+        equo match --installed --quiet -- "${pkg}" )
+
+    if [[ -n ${output} ]]; then
+        return 0
+    else
+        return 1
+    fi
+}
 
 # Execute a command inside chroot
 # Signature: exec_chroot <chroot path> <command ...>
@@ -80,7 +130,6 @@ exec_chroot() {
 live_install() {
     local src="${1}"
     local dst="${2}"
-
     rsync -a --delete-during -H -A -X -x "${src}/" "${dst}/"
     return ${?}
 }
@@ -233,8 +282,9 @@ setup_language() {
     local opt
     for opt in kde openoffice mozilla; do
         exec_chroot "${_chroot}" /sbin/language-setup \
-            "${_lang/.*}" "${opt}"  &> /dev/null  # ignore failure
+            "${_lang/.*}" "${opt}" &> /dev/null
     done
+    return 0 # ignore failures in the loop above
 }
 
 
@@ -245,18 +295,18 @@ setup_network() {
 
     if [ "${NM_NETWORK}" = "1" ]; then
         exec_chroot "${_chroot}" rc-update del \
-            netmount default &> /dev/null
+            netmount default
         exec_chroot "${_chroot}" rc-update del \
-            nfsmount default &> /dev/null
+            nfsmount default
     else
         exec_chroot "${_chroot}" rc-update del \
-            NetworkManager default &> /dev/null
+            NetworkManager default
         exec_chroot "${_chroot}" rc-update del \
-            NetworkManager-setup default &> /dev/null
+            NetworkManager-setup default
         exec_chroot "${_chroot}" rc-update del \
-            avahi-daemon default &> /dev/null
+            avahi-daemon default
         exec_chroot "${_chroot}" rc-update del \
-            dhcdbd default &> /dev/null
+            dhcdbd default
 
         local _rc_conf="${_chroot}/etc/rc.conf"
         if [ -f "${_rc_conf}" ]; then
@@ -266,6 +316,9 @@ setup_network() {
                 "${_rc_conf}" || return ${?}
         fi
     fi
+
+    # ignore failures
+    return 0
 }
 
 
@@ -286,8 +339,9 @@ setup_keyboard() {
     local opt
     for opt in e17 gnome kde lxde system xfce xorg; do
         exec_chroot "${_chroot}" /sbin/keyboard-setup-2 \
-            "${_key_map}" "${opt}"  &>/dev/null  # ignore failure
+            "${_key_map}" "${opt}" &>/dev/null
     done
+    return 0 # ignore failure in the loop above
 }
 
 
@@ -333,8 +387,31 @@ _remove_proprietary_drivers() {
         for gl_path in "${gl_paths[@]}"; do
             rm -rf "${_chroot}/${gl_path}"
         done
+
+        local prop_packages_to_remove=()
+        local pkg
+        for pkg in "${prop_packages[@]}"; do
+            if is_package_installed "${_chroot}" "${pkg}"; then
+                prop_packages_to_remove+=( "${pkg}" )
+            else
+                echo "${pkg} already not installed"
+            fi
+        done
+
+        if [[ ${#prop_packages_to_remove[@]} -eq 0 ]]; then
+            echo "No packages to remove."
+            return 0
+        fi
+
+        local ret
         exec_chroot "${_chroot}" \
-            equo remove "${prop_packages[@]}" || return ${?}
+            equo remove "${prop_packages_to_remove[@]}"
+        ret=${?}
+        if [[ ${ret} -ne 0 ]]; then
+            warn "error: command 'equo remove ${prop_packages_to_remove[*]}'"
+            warn "failed with exit status ${ret}"
+            return ${ret}
+        fi
     fi
 
     local _mod_conf="/etc/conf.d/modules"
@@ -370,8 +447,28 @@ _setup_nvidia_legacy() {
     fi
 
     # remove current
-    exec_chroot "${_chroot}" equo remove \
-        nvidia-drivers nvidia-userspace  || return ${?}
+    local packages_to_remove=()
+    local pkg_to_remove
+    for pkg_to_remove in nvidia-drivers nvidia-userspace; do
+        if is_package_installed "${_chroot}" "${pkg_to_remove}"; then
+            packages_to_remove+=( "${pkg_to_remove}" )
+        else
+            echo "${pkg_to_remove} already not installed"
+        fi
+    done
+
+    local ret
+    if [[ ${#packages_to_remove[@]} -eq 0 ]]; then
+        echo "No packages to remove."
+    else
+        exec_chroot "${_chroot}" equo remove "${packages_to_remove[@]}"
+        ret=${?}
+        if [[ ${ret} -ne 0 ]]; then
+            warn "error: command 'equo remove ${packages_to_remove[*]}'"
+            warn "failed with exit status ${ret}"
+            return ${ret}
+        fi
+    fi
 
     local nv_ver=$(cat "${running_file}")
     local ver=
@@ -470,8 +567,12 @@ setup_xorg() {
         cp -p "${chroot_xorg_file}" "${chroot_xorg_file}.original" \
             || return ${?}
     fi
-    _remove_proprietary_drivers "${_chroot}" || return ${?}
-    _setup_nvidia_legacy "${_chroot}" || return ${?}
+
+    _remove_proprietary_drivers "${_chroot}"
+    inform_status ${?} "_remove_proprietary_drivers" || return ${?}
+
+    _setup_nvidia_legacy "${_chroot}"
+    inform_status ${?} "_setup_nvidia_legacy" || return ${?}
 }
 
 
@@ -605,9 +706,16 @@ setup_udev() {
         return 1
     fi
 
-    mount --move "${_chroot}/dev" "${tmp_dir}" || return ${?}
+    if [[ ${SOURCE_IS_LIVE_SYSTEM} = 1 ]]; then
+        # Installing from a running system (such like a Live CD)
+        mount --move "${_chroot}/dev" "${tmp_dir}" || return ${?}
+    fi
+
     cp -Rp /dev/* "${_chroot}/dev/" || return ${?}
-    mount --move "${tmp_dir}" "${_chroot}/dev" || return ${?}
+
+    if [[ ${SOURCE_IS_LIVE_SYSTEM} = 1 ]]; then
+        mount --move "${tmp_dir}" "${_chroot}/dev" || return ${?}
+    fi
     rm -rf "${tmp_dir}"
 }
 
@@ -729,46 +837,59 @@ installer_main() {
 
     echo "Copying system:  ${_srcroot} -> ${_chroot}"
     echo "Please wait, this will take 10-15 minutes"
-    live_install "${_srcroot}" "${_chroot}" || return ${?}
+    live_install "${_srcroot}" "${_chroot}"
+    inform_status ${?} || return ${?}
 
     echo "System copy complete, configuring users"
-    setup_users "${_chroot}" "${_root_pass}" "${_user}" "${_user_pass}" \
-        || return ${?}
+    setup_users "${_chroot}" "${_root_pass}" "${_user}" "${_user_pass}"
+    inform_status ${?} || return ${?}
 
     echo "Configuring language..."
-    setup_language "${_chroot}" || return ${?}
+    setup_language "${_chroot}"
+    inform_status ${?} || return ${?}
 
     echo "Configuring networking..."
-    setup_network "${_chroot}" || return ${?}
+    setup_network "${_chroot}"
+    inform_status ${?} || return ${?}
 
     echo "Configuring keyboard mappings..."
-    setup_keyboard "${_chroot}" || return ${?}
+    setup_keyboard "${_chroot}"
+    inform_status ${?} || return ${?}
 
     echo "Configuring X.Org..."
-    setup_xorg "${_chroot}" || return ${?}
+    setup_xorg "${_chroot}"
+    inform_status ${?} || return ${?}
 
     echo "Configuring audio..."
-    setup_audio "${_chroot}" || return ${?}
+    setup_audio "${_chroot}"
+    inform_status ${?} || return ${?}
 
     echo "Configuring sudo..."
-    setup_sudo "${_chroot}" || return ${?}
+    setup_sudo "${_chroot}"
+    inform_status ${?} || return ${?}
 
     echo "Configuring services..."
-    setup_services "${_chroot}" || return ${?}
+    setup_services "${_chroot}"
+    inform_status ${?} || return ${?}
 
     echo "Configuring udev..."
-    setup_udev "${_chroot}" || return ${?}
+    setup_udev "${_chroot}"
+    inform_status ${?} || return ${?}
 
     echo "Configuring SecureBoot..."
-    setup_secureboot "${_chroot}" || return ${?}
+    setup_secureboot "${_chroot}"
+    inform_status ${?} || return ${?}
 
     echo "Configuring misc stuff..."
-    setup_misc "${_chroot}" || return ${?}
+    setup_misc "${_chroot}"
+    inform_status ${?} || return ${?}
 
     echo "Configuring Entropy..."
-    setup_entropy "${_chroot}" || return ${?}
+    setup_entropy "${_chroot}"
+    inform_status ${?} || return ${?}
 
-    _emit_install_done || return ${?}
+    _emit_install_done
+    inform_status ${?} "_emit_install_done" || return ${?}
 
     # TODO: missing routines
     # - /etc/fstab configuration
