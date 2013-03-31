@@ -39,7 +39,13 @@ except ImportError:
 # Entropy imports
 from entropy.exceptions import EntropyPackageException, DependenciesNotFound, \
     DependenciesCollision
-from entropy.const import etpUi, etpConst, etpSys
+from entropy.const import etpConst, etpSys
+try:
+    from entropy.const import etpUi # Entropy 145
+    is_mute, set_mute = None, None
+except ImportError:
+    etpUi = None
+    from entropy.output import is_mute, set_mute
 import entropy.tools
 import entropy.dep
 from entropy.core.settings.base import SystemSettings
@@ -51,13 +57,22 @@ import logging
 from constants import productPath
 from sabayon import Entropy
 from sabayon.const import LIVE_USER, LANGUAGE_PACKS, REPO_NAME, \
-    ASIAN_FONTS_PACKAGES, FIREWALL_SERVICE
+    ASIAN_FONTS_PACKAGES, FIREWALL_SERVICE, SB_PRIVATE_KEY, \
+    SB_PUBLIC_X509, SB_PUBLIC_DER
 
 import gettext
 _ = lambda x: gettext.ldgettext("anaconda", x)
 
 STDERR_LOG = open("/tmp/anaconda.log","aw")
 log = logging.getLogger("anaconda")
+
+
+def _set_mute(status):
+    if etpUi is not None:
+        etpUi['mute'] = status
+    else:
+        set_mute(status)
+
 
 class SabayonProgress(Singleton):
 
@@ -294,7 +309,7 @@ class SabayonInstall:
         oldstdout = sys.stdout
         if silent:
             sys.stdout = STDERR_LOG
-            etpUi['mute'] = True
+            _set_mute(True)
 
         try:
             rc = 0
@@ -309,7 +324,7 @@ class SabayonInstall:
         finally:
             if silent:
                 sys.stdout = oldstdout
-                etpUi['mute'] = False
+                _set_mute(False)
             if chroot != root:
                 self._change_entropy_chroot(root)
 
@@ -331,7 +346,7 @@ class SabayonInstall:
         oldstdout = sys.stdout
         if silent:
             sys.stdout = STDERR_LOG
-            etpUi['mute'] = True
+            _set_mute(True)
 
         try:
             rc = 0
@@ -344,7 +359,7 @@ class SabayonInstall:
         finally:
             if silent:
                 sys.stdout = oldstdout
-                etpUi['mute'] = False
+                _set_mute(False)
 
         if chroot != root:
             self._change_entropy_chroot(root)
@@ -514,11 +529,21 @@ class SabayonInstall:
                     with open(custom_gdm, "w") as gdm_f:
                         gdm_config.write(gdm_f)
 
+        # drop /install-data now, bug 4019
+        install_data_dir = os.path.join(self._root, "install-data")
+        if os.path.isdir(install_data_dir):
+            shutil.rmtree(install_data_dir, True)
+
     def remove_proprietary_drivers(self):
         """
         Detect a possible OSS video card and remove /etc/env.d/*ati
         """
-        if self._get_opengl() == "xorg-x11":
+        bb_enabled = os.path.exists("/tmp/.bumblebee.enabled")
+        radeon_kms_enabled = os.path.exists("/tmp/.radeon.kms")
+
+        xorg_x11 = self._get_opengl() == "xorg-x11"
+
+        if xorg_x11 and not bb_enabled:
             ogl_script = """
                 rm -f /etc/env.d/09ati
                 rm -rf /usr/lib/opengl/ati
@@ -532,8 +557,8 @@ class SabayonInstall:
             self.remove_package('nvidia-userspace', silent = True)
 
         # created by gpu-detector
-        if os.path.isfile("/tmp/.radeon.kms"):
-            # since CONFIG_DRM_RADEON_KMS=n on our kernel
+        if radeon_kms_enabled:
+            # (<3.6.0 kernel) since CONFIG_DRM_RADEON_KMS=n on our kernel
             # we need to force radeon to load at boot
             modules_conf = self._root + "/etc/conf.d/modules"
             with open(modules_conf, "a+") as mod_f:
@@ -545,6 +570,13 @@ class SabayonInstall:
 modules="radeon"
 module_radeon_args="modeset=1"
 """)
+
+        # bumblebee support
+        if bb_enabled:
+            bb_script = """
+            rc-update add bumblebee default
+            """
+            self.spawn_chroot(bb_script, silent = True)
 
     def copy_udev(self):
         tmp_dir = tempfile.mkdtemp()
@@ -668,6 +700,39 @@ module_radeon_args="modeset=1"
                 sudo_f.write("\n#Added by Rogentos Installer\n%wheel ALL=ALL\n")
                 sudo_f.flush()
 
+    def setup_secureboot(self):
+        if not self._anaconda.platform.isEfi:
+            # nothing to do about SecureBoot crap
+            return
+
+        make = "/usr/lib/quickinst/make-secureboot.sh"
+        private = self._root + SB_PRIVATE_KEY
+        public = self._root + SB_PUBLIC_X509
+        der = self._root + SB_PUBLIC_DER
+
+        orig_der = der[:]
+        count = 0
+        while os.path.lexists(der):
+            count += 1
+            der = orig_der + ".%d" % (count,)
+            assert count < 1000, "Infinite loop"
+
+        for path in (private, public, der):
+            _dir = os.path.dirname(path)
+            if not os.path.isdir(_dir):
+                os.makedirs(_dir)
+
+        exit_st = subprocess.call(
+            [make, private, public, der])
+        if exit_st != 0:
+            log.warning(
+                "Cannot execute make-secureboot, error: %d", exit_st)
+            msg = _("Cannot generate a SecureBoot key, error: %d") % (
+                exit_st,)
+            self._intf.messageWindow(
+                _("SecureBoot Problem"), msg,
+                custom_icon="warning")
+
     def setup_audio(self):
         asound_state = "/etc/asound.state"
         asound_state2 = "/var/lib/alsa/asound.state"
@@ -783,55 +848,48 @@ module_radeon_args="modeset=1"
             return
 
         f = open(running_file)
+        # this contains the version we need to match.
         nv_ver = f.readline().strip()
         f.close()
 
-        if nv_ver.find("17x.xx.xx") != -1:
-            nv_ver = "17"
-        elif nv_ver.find("9x.xx") != -1:
-            nv_ver = "9"
-        else:
-            nv_ver = "7"
+        matches = [
+            "=x11-drivers/nvidia-drivers-" + nv_ver + "*",
+            "=x11-drivers/nvidia-userspace-" + nv_ver + "*",
+            ]
+        files = [
+            "x11-drivers:nvidia-drivers-" + nv_ver,
+            "x11-drivers:nvidia-userspace-" + nv_ver,
+            ]
 
-        legacy_unmask_map = {
-            "7": "=x11-drivers/nvidia-drivers-7*",
-            "9": "=x11-drivers/nvidia-drivers-9*",
-            "17": "=x11-drivers/nvidia-drivers-17*"
-        }
-
+        # remove current
         self.remove_package('nvidia-drivers', silent = True)
-        for pkg_file in os.listdir(drivers_dir):
+        self.remove_package('nvidia-userspace', silent = True)
 
-            if not pkg_file.startswith("x11-drivers:nvidia-drivers-"+nv_ver):
-                continue
+        # install new
+        packages = os.listdir(drivers_dir)
+        _packages = []
+        for pkg_file in packages:
+            for target_file in files:
+                if pkg_file.startswith(target_file):
+                    _packages.append(pkg_file)
 
-            pkg_filepath = os.path.join(drivers_dir, pkg_file)
+        packages = [os.path.join(drivers_dir, x) for x in _packages]
+        completed = True
+
+        for pkg_filepath in packages:
+
+            pkg_file = os.path.basename(pkg_filepath)
             if not os.path.isfile(pkg_filepath):
                 continue
-            dest_pkg_filepath = os.path.join(self._root + "/", pkg_file)
+
+            dest_pkg_filepath = os.path.join(
+                self._root + "/", pkg_file)
             shutil.copy2(pkg_filepath, dest_pkg_filepath)
 
             rc = self.install_package_file(dest_pkg_filepath)
+            _completed = rc == 0
 
-            # mask all the nvidia-drivers, this avoids having people
-            # updating their drivers resulting in a non working system
-            mask_file = os.path.join(self._root+'/',
-                "etc/entropy/packages/package.mask")
-            unmask_file = os.path.join(self._root+'/',
-                "etc/entropy/packages/package.unmask")
-            if os.access(mask_file, os.W_OK) and os.path.isfile(mask_file):
-                f = open(mask_file,"aw")
-                f.write("\n# added by Rogentos Installer\nx11-drivers/nvidia-drivers\n")
-                f.flush()
-                f.close()
-            if os.access(unmask_file, os.W_OK) and os.path.isfile(unmask_file):
-                f = open(unmask_file,"aw")
-                f.write("\n# added by Rogentos Installer\n%s\n" % (
-                    legacy_unmask_map[nv_ver],))
-                f.flush()
-                f.close()
-
-            if rc != 0:
+            if not _completed:
                 question_text = "%s: %s" % (
                     _("An issue occured while installing"),
                     pkg_file,)
@@ -845,7 +903,28 @@ module_radeon_args="modeset=1"
             except OSError:
                 pass
 
-            break
+            if not _completed:
+                completed = False
+
+        if completed:
+            # mask all the nvidia-drivers, this avoids having people
+            # updating their drivers resulting in a non working system
+            mask_file = os.path.join(self._root+'/',
+                "etc/entropy/packages/package.mask")
+            unmask_file = os.path.join(self._root+'/',
+                "etc/entropy/packages/package.unmask")
+
+            if os.access(mask_file, os.W_OK) and os.path.isfile(mask_file):
+                with open(mask_file,"aw") as f:
+                    f.write("\n# added by the Sabayon Installer\n")
+                    f.write("x11-drivers/nvidia-drivers\n")
+                    f.write("x11-drivers/nvidia-userspace\n")
+
+            if os.access(unmask_file, os.W_OK) and os.path.isfile(unmask_file):
+                with open(unmask_file, "aw") as f:
+                    f.write("\n# added by the Sabayon Installer\n")
+                    for dep in matches:
+                        f.write("%s\n" % (dep,))
 
         # force OpenGL reconfiguration
         ogl_script = """
@@ -1225,7 +1304,7 @@ module_radeon_args="modeset=1"
         oldstdout = sys.stdout
         if silent:
             sys.stdout = STDERR_LOG
-            etpUi['mute'] = True
+            _set_mute(True)
 
         try:
             # fetch_security = False => avoid spamming stdout
@@ -1263,7 +1342,7 @@ module_radeon_args="modeset=1"
 
             if silent:
                 sys.stdout = oldstdout
-                etpUi['mute'] = False
+                _set_mute(False)
             self._entropy.close_repositories()
             self._settings.clear()
             if chroot != root:

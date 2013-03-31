@@ -1,6 +1,6 @@
-# sabayon/Makefile.am for anaconda
+# sabayon/quickinst/Makefile.am for anaconda
 #
-# Copyright (C) 2009  Red Hat, Inc.
+# Copyright (C) 2012  Sabayon Linux
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU Lesser General Public License as published
@@ -17,9 +17,9 @@
 #
 # Author: Fabio Erculiani <lxnay@sabayon.org>
 
-sabayondir = $(pyexecdir)/py$(PACKAGE_NAME)/sabayon
-sabayon_PYTHON = *.py
+quickinstdir = $(libdir)/quickinst
+
+dist_quickinst_SCRIPTS = quickinst.sh iso-installer.sh \
+	make-secureboot.sh
 
 MAINTAINERCLEANFILES = Makefile.in
-
-SUBDIRS = quickinst
