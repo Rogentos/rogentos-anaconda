@@ -97,7 +97,8 @@ class LiveCDCopyBackend(backend.AnacondaBackend):
         self._sabayon_install = sabayon.utils.SabayonInstall(anaconda)
         # We use anaconda.upgrade as bootloader recovery step
         self._bootloader_recovery = anaconda.upgrade
-        self._install_grub = not self.anaconda.dispatch.stepInSkipList("instbootloader")
+        self._install_grub = not self.anaconda.dispatch.stepInSkipList(
+            "instbootloader")
 
     def doInstall(self, anaconda):
 
@@ -123,8 +124,6 @@ class LiveCDCopyBackend(backend.AnacondaBackend):
         # if simple networking is enabled, disable NetworkManager
         if self.anaconda.instClass.simplenet:
             self._sabayon_install.setup_manual_networking()
-        else:
-            self._sabayon_install.setup_networkmanager_networking()
         self._sabayon_install.setup_keyboard()
 
         action = _("Configuring Rogentos")
@@ -239,7 +238,8 @@ class LiveCDCopyBackend(backend.AnacondaBackend):
                     return True
 
                 # HACK: since swap device path value is potentially changed
-                # it is required to rewrite the fstab (circular dependency, sigh)
+                # it is required to rewrite the fstab
+                # (circular dependency, sigh)
                 self.anaconda.storage.fsset.write(
                     crypt_filter_callback=_crypt_filter_callback)
                 if swap_crypted and swap_dev_name_changed:
@@ -313,13 +313,13 @@ class LiveCDCopyBackend(backend.AnacondaBackend):
 
         # look for kernel arguments we know should be preserved and add them
         ourargs = ["speakup_synth=", "apic", "noapic", "apm=", "ide=", "noht",
-            "acpi=", "video=", "vga=", "gfxpayload=", "init=", "splash=", "console=",
-            "pci=routeirq", "irqpoll", "nohdparm", "pci=", "floppy.floppy=",
-            "all-generic-ide", "gentoo=", "res=", "hsync=", "refresh=", "noddc",
-            "xdriver=", "onlyvesa", "nvidia=", "dodmraid", "dmraid",
-            "sabayonmce", "quiet", "scandelay=", "doslowusb", "docrypt",
-            "dokeymap", "keymap=", "radeon.modeset=", "modeset=", "nomodeset",
-            "domdadm"]
+            "acpi=", "video=", "vga=", "gfxpayload=", "init=", "splash=",
+            "console=", "pci=routeirq", "irqpoll", "nohdparm", "pci=",
+            "floppy.floppy=", "all-generic-ide", "gentoo=", "res=", "hsync=",
+            "refresh=", "noddc", "xdriver=", "onlyvesa", "nvidia=", "dodmraid",
+            "dmraid", "sabayonmce", "quiet", "scandelay=", "doslowusb",
+            "docrypt", "dokeymap", "keymap=", "radeon.modeset=", "modeset=",
+            "nomodeset", "domdadm"]
 
         # Sabayon MCE install -> MCE support
         # use reference, yeah
@@ -387,7 +387,8 @@ class LiveCDCopyBackend(backend.AnacondaBackend):
 
             if swap_crypted:
                 # genkernel hardcoded bullshit, cannot change /dev/mapper/swap
-                # change inside swap_dev, fstabSpec should return /dev/mapper/swap
+                # change inside swap_dev, fstabSpec should return
+                # /dev/mapper/swap
                 swap_crypted = ("swap", swap_dev)
                 # if the swap device is on top of LVM LV device, don't
                 # force /dev/mapper/swap, because it's not going to work
@@ -409,7 +410,8 @@ class LiveCDCopyBackend(backend.AnacondaBackend):
                 final_cmdline.append("real_resume=%s" % (swap_dev.fstabSpec,))
 
         # setup LVM
-        lvscan_out = commands.getoutput("LANG=C LC_ALL=C lvscan").split("\n")[0].strip()
+        lvscan_out = commands.getoutput("LANG=C LC_ALL=C lvscan").split(
+            "\n")[0].strip()
         if not lvscan_out.startswith("No volume groups found"):
             final_cmdline.append("dolvm")
 
@@ -625,7 +627,8 @@ password root """+str(self.anaconda.bootloader.pure)+"""
             rc = anaconda.intf.messageWindow(_("Warning"),
                 _("The root filesystem you created is "
                   "not large enough for this live "
-                  "image (%.2f MB required). But I could be mistaken.") % ossize,
+                  "image (%.2f MB required). But I "
+                  "could be mistaken.") % ossize,
                 type = "custom",
                 custom_icon = "error",
                 custom_buttons=[_("_Back"),

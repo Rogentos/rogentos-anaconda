@@ -455,58 +455,63 @@ class SabayonInstall:
             is_sabayon_mce = "0"
 
         # Remove Installer services
-        config_script = """
-            rc-update del installer-gui boot default
-            rm -f /etc/init.d/installer-gui
-            rc-update del installer-text boot default
-            rm -f /etc/init.d/installer-text
-            rc-update del music boot default
-            rm -f /etc/init.d/music
-            rc-update del rogentoslive boot default
-            rm -f /etc/init.d/rogentoslive
-            rc-update add vixie-cron default
-            if [ ! -e "/etc/init.d/net.eth0" ]; then
-                cd /etc/init.d && ln -s net.lo net.eth0
-            fi
-            if [ -e "/etc/init.d/nfsmount" ]; then
-                rc-update add nfsmount default
-            fi
-            if [ -e "/etc/init.d/cdeject" ]; then
-                rc-update del cdeject shutdown
-            fi
-            if [ -e "/etc/init.d/oemsystem-boot" ]; then
-                rc-update add oemsystem-boot boot
-            fi
-            if [ -e "/etc/init.d/oemsystem-default" ]; then
-                rc-update add oemsystem-default default
-            fi
-            if [ "0" = """+is_sabayon_mce+""" ]; then
-                rc-update del sabayon-mce boot
-                rc-update del sabayon-mce default
-            fi
-            if [ -e "/etc/init.d/dmcrypt" ]; then
-                rc-update add dmcrypt boot
-            fi
+        config_script = """\
+        rc-update del installer-gui boot default
+        rc-update del installer-text boot default
+        systemctl --no-reload disable installer-gui.service
+        systemctl --no-reload disable installer-text.service
+
+        rc-update del sabayonlive boot default
+        systemctl --no-reload disable rogentosive.service
+
+        rc-update add vixie-cron default
+        systemctl --no-reload enable vixie-cron.service
+
+        rc-update del music boot default
+        systemctl --no-reload disable music.service
+
+        rc-update add nfsmount default
+
+        rc-update del cdeject shutdown
+        systemctl --no-reload disable cdeject.service
+
+        rc-update add oemsystem-boot boot
+        rc-update add oemsystem-default default
+        systemctl --no-reload enable oemsystem.service
+
+        rc-update add dmcrypt boot
+
+        if [ "0" = """+is_sabayon_mce+""" ]; then
+            rc-update del sabayon-mce boot
+            rc-update del sabayon-mce default
+            systemctl --no-reload disable sabayon-mce.service
+        fi
+
+        cd /etc/init.d && ln -s net.lo net.eth0
         """
         self.spawn_chroot(config_script, silent = True)
 
-        # setup dmcrypt service if user enabled encryption
-        if self._is_encrypted():
-            self.spawn_chroot("rc-update add dmcrypt boot", silent = True)
-
         if self._is_virtualbox():
-            self.spawn_chroot("rc-update add virtualbox-guest-additions boot",
-                silent = True)
+            self.spawn_chroot("""\
+            rc-update add virtualbox-guest-additions boot
+            systemctl --no-reload enable virtualbox-guest-additions.service
+            """, silent = True)
         else:
-            self.spawn_chroot("rc-update del virtualbox-guest-additions boot",
-                silent = True)
+            self.spawn_chroot("""\
+            rc-update del virtualbox-guest-additions boot
+            systemctl --no-reload disable virtualbox-guest-additions.service
+            """, silent = True)
 
         if self._is_firewall_enabled():
-            self.spawn_chroot("rc-update add %s default" % (
-                FIREWALL_SERVICE,), silent = True)
+            self.spawn_chroot("""\
+            rc-update add %s default
+            systemctl --no-reload enable %s.service
+            """ % (FIREWALL_SERVICE, FIREWALL_SERVICE,), silent = True)
         else:
-            self.spawn_chroot("rc-update del %s boot default" % (
-                FIREWALL_SERVICE,), silent = True)
+            self.spawn_chroot("""\
+            rc-update del %s boot default
+            systemctl --no-reload disable %s.service
+            """ % (FIREWALL_SERVICE, FIREWALL_SERVICE,), silent = True)
 
         # XXX: hack
         # For GDM, set DefaultSession= to /etc/skel/.dmrc value
@@ -575,6 +580,7 @@ module_radeon_args="modeset=1"
         if bb_enabled:
             bb_script = """
             rc-update add bumblebee default
+            systemctl --no-reload enable bumblebeed.service
             """
             self.spawn_chroot(bb_script, silent = True)
 
@@ -654,15 +660,10 @@ module_radeon_args="modeset=1"
                 sed -i 's/^rc_hotplug=".*"/rc_hotplug="*"/g' /etc/rc.conf
             fi
         """
+        # TODO: check if we need this with systemd. I'd say no.
+        # systemctl --no-reload disable NetworkManager.service
+        # systemctl --no-reload disable NetworkManager-wait-online.service
         self.spawn_chroot(mn_script, silent = True)
-
-    def setup_networkmanager_networking(self):
-        # our NM hook already mounts network shares
-        nm_script = """
-            rc-update del netmount default
-            rc-update del nfsmount default
-        """
-        self.spawn_chroot(nm_script, silent = True)
 
     def get_keyboard_layout(self):
         console_kbd = self._anaconda.keyboard.get()
@@ -697,7 +698,7 @@ module_radeon_args="modeset=1"
         if os.path.isfile(sudoers_file):
             self.spawn("sed -i '/NOPASSWD/ s/^/#/' %s" % (sudoers_file,))
             with open(sudoers_file, "a") as sudo_f:
-                sudo_f.write("\n#Added by Rogentos Installer\n%wheel ALL=ALL\n")
+                sudo_f.write("\n#Added by Rogentos Installer\n%wheel  ALL=ALL\n")
                 sudo_f.flush()
 
     def setup_secureboot(self):
@@ -787,16 +788,38 @@ module_radeon_args="modeset=1"
                 con_f.write(line)
             con_f.flush()
 
+        # /etc/vconsole.conf support
+        vconsole_conf = self._root + "/etc/vconsole.conf"
+        content = []
+        if os.path.isfile(vconsole_conf):
+            with open(vconsole_conf, "r") as f:
+                for line in f.readlines():
+                    if line.startswith("FONT="):
+                        continue
+                    content.append(line)
+
+        content.append("FONT=%s\n" % (system_font,))
+        with open(vconsole_conf, "w") as f:
+            f.writelines(content)
+            f.flush()
+
     def setup_language(self):
         # Prepare locale variables
 
         info = self._anaconda.instLanguage.info
-        f = open(self._root + "/etc/env.d/02locale", "w")
-        for key in info.keys():
-            if info[key] is not None:
-                f.write("%s=\"%s\"\n" % (key, info[key]))
-        f.flush()
-        f.close()
+
+        with open(self._root + "/etc/env.d/02locale", "w") as f:
+            for key in info.keys():
+                if info[key] is not None:
+                    f.write("%s=\"%s\"\n" % (key, info[key]))
+            f.flush()
+
+        # systemd support, same syntax as 02locale for now
+        with open(self._root + "/etc/locale.conf", "w") as f:
+            for key in info.keys():
+                if info[key] is not None:
+                    f.write("%s=\"%s\"\n" % (key, info[key]))
+            f.flush()
 
         # write locale.gen
         supported_file = "/usr/share/i18n/SUPPORTED"
@@ -827,15 +850,6 @@ module_radeon_args="modeset=1"
                 system_font + ".psfu.gz")
             if os.path.isfile(system_font_path):
                 self._setup_consolefont(system_font)
-
-        localization = self._anaconda.instLanguage.instLang.split(".")[0]
-        # Configure KDE language
-        self.spawn_chroot(("/sbin/language-setup", localization, "kde"),
-            silent = True)
-        self.spawn_chroot(("/sbin/language-setup", localization, "openoffice"),
-            silent = True)
-        self.spawn_chroot(("/sbin/language-setup", localization, "mozilla"),
-            silent = True)
 
     def setup_nvidia_legacy(self):
 
