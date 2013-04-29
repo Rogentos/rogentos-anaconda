@@ -445,6 +445,12 @@ class SabayonInstall:
             return True
         return False
 
+    def _is_systemd_running(self):
+        return os.path.isdir("/run/systemd/system")
+
+    def _is_openrc_running(self):
+        return os.path.exists("/run/openrc/softlevel")
+
     def configure_services(self):
 
         action = _("Configuring System Services")
@@ -462,7 +468,8 @@ class SabayonInstall:
         systemctl --no-reload disable installer-text.service
 
         rc-update del sabayonlive boot default
-        systemctl --no-reload disable rogentosive.service
+        systemctl --no-reload disable sabayonlive.service
+        systemctl --no-reload enable x-setup.service
 
         rc-update add vixie-cron default
         systemctl --no-reload enable vixie-cron.service
@@ -512,6 +519,17 @@ class SabayonInstall:
             rc-update del %s boot default
             systemctl --no-reload disable %s.service
             """ % (FIREWALL_SERVICE, FIREWALL_SERVICE,), silent = True)
+
+        if self._is_systemd_running():
+            self.spawn_chroot("""\
+            eselect sysvinit set systemd
+            eselect settingsd set systemd
+            """, silent = True)
+        elif self._is_openrc_running():
+            self.spawn_chroot("""\
+            eselect sysvinit set sysvinit
+            eselect settingsd set openrc
+            """, silent = True)
 
         # XXX: hack
         # For GDM, set DefaultSession= to /etc/skel/.dmrc value
@@ -583,13 +601,6 @@ module_radeon_args="modeset=1"
             systemctl --no-reload enable bumblebeed.service
             """
             self.spawn_chroot(bb_script, silent = True)
-
-    def copy_udev(self):
-        tmp_dir = tempfile.mkdtemp()
-        self.spawn("mount --move %s/dev %s" % (self._root, tmp_dir,))
-        self.spawn("cp /dev/* %s/dev/ -Rp" % (self._root,))
-        self.spawn("mount --move %s %s/dev" % (tmp_dir, self._root,))
-        shutil.rmtree(tmp_dir, True)
 
     def _get_opengl(self, chroot = None):
         """
@@ -1022,7 +1033,7 @@ module_radeon_args="modeset=1"
 
             copy_update_counter += 1
             to_currentdir = currentdir[image_dir_len:]
-            for t_dir in ("/proc", "/dev", "sys"):
+            for t_dir in ("/proc", "/dev", "/sys"):
                 if to_currentdir.startswith(t_dir):
                     # don't touch subdirs
                     subdirs = []
@@ -1070,14 +1081,11 @@ module_radeon_args="modeset=1"
                 currentfile = fromfile[image_dir_len:]
 
                 if currentfile.startswith("/dev/"):
-                    if currentfile != "/dev/.keep":
-                        continue
+                    continue
                 if currentfile.startswith("/proc/"):
-                    if currentfile != "/proc/.keep":
-                        continue
+                    continue
                 if currentfile.startswith("/sys/"):
-                    if currentfile != "/sys/.keep":
-                        continue
+                    continue
 
                 try:
                     # if file is in the ignore list
