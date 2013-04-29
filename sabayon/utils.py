@@ -467,8 +467,8 @@ class SabayonInstall:
         systemctl --no-reload disable installer-gui.service
         systemctl --no-reload disable installer-text.service
 
-        rc-update del sabayonlive boot default
-        systemctl --no-reload disable sabayonlive.service
+        rc-update del rogentoslive boot default
+        systemctl --no-reload disable rogentoslive.service
         systemctl --no-reload enable x-setup.service
 
         rc-update add vixie-cron default
