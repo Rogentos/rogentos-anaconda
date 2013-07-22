@@ -1,5 +1,5 @@
 #
-# sabayon.py: Sabayon Linux Anaconda install method backend
+# sabayon.py: Sabayon and RogentOS Linux Anaconda install method backend
 #
 #
 # Copyright (C) 2010 Fabio Erculiani

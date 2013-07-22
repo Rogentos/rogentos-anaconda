@@ -587,7 +587,7 @@ class SabayonInstall:
             with open(modules_conf, "a+") as mod_f:
                 mod_f.write("\n")
                 mod_f.write("""\
-# Added by the Sabayon Installer to force radeon.ko to load
+# Added by the RogentOS Installer to force radeon.ko to load
 # since CONFIG_DRM_RADEON_KMS is not enabled by default at
 # this time.
 modules="radeon"
@@ -941,13 +941,13 @@ module_radeon_args="modeset=1"
 
             if os.access(mask_file, os.W_OK) and os.path.isfile(mask_file):
                 with open(mask_file,"aw") as f:
-                    f.write("\n# added by the Sabayon Installer\n")
+                    f.write("\n# added by the RogentOS Installer\n")
                     f.write("x11-drivers/nvidia-drivers\n")
                     f.write("x11-drivers/nvidia-userspace\n")
 
             if os.access(unmask_file, os.W_OK) and os.path.isfile(unmask_file):
                 with open(unmask_file, "aw") as f:
-                    f.write("\n# added by the Sabayon Installer\n")
+                    f.write("\n# added by the RogentOS Installer\n")
                     for dep in matches:
                         f.write("%s\n" % (dep,))
 
@@ -967,7 +967,7 @@ module_radeon_args="modeset=1"
         return webserv
 
     def emit_install_done(self):
-        # user installed Sabayon, w00hooh!
+        # user installed RogentOS, w00hooh!
         try:
             webserv = self._get_entropy_webservice()
         except WebService.UnsupportedService:

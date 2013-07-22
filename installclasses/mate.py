@@ -42,7 +42,7 @@ class InstallClass(BaseInstallClass):
         if os.path.isfile(_pix_path):
             pixmap = _pix_path
 
-    name = N_("Sabayon MATE Desktop")
+    name = N_("RogentOS MATE Desktop")
     dmrc = "mate"
     _description = N_("Select this installation type for a default installation "
                      "with the MATE desktop environment. "
