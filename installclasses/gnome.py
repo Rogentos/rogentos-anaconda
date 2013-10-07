@@ -42,8 +42,16 @@ class InstallClass(BaseInstallClass):
         if os.path.isfile(_pix_path):
             pixmap = _pix_path
 
+<<<<<<< HEAD
     name = N_("Rogentos GNOME Desktop")
+=======
+    name = N_("Sabayon GNOME Desktop")
+
+>>>>>>> upstream/master
     dmrc = "gnome"
+    if Entropy().is_sabayon_steambox():
+        dmrc = "steambox"
+
     _description = N_("Select this installation type for a default installation "
                      "with the GNOME desktop environment. "
                      "After this installation process you will "

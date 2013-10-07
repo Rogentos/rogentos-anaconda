@@ -679,6 +679,7 @@ setup_services() {
             rc-update del sabayon-mce boot default &>/dev/null
         sd_disable "${_chroot}" sabayon-mce
     fi
+
     if [ -e "${_chroot}/etc/init.d/dmcrypt" ]; then
         exec_chroot "${_chroot}" \
             rc-update add dmcrypt boot
