@@ -401,7 +401,7 @@ class SabayonInstall:
         if not Entropy.is_sabayon_steambox():
             return
 
-        steambox_user_file = self._root + "/etc/sabayon/steambox-user"
+        steambox_user_file = self._root + "/etc/rogentos/steambox-user"
         steambox_user_dir = os.path.dirname(steambox_user_file)
         if not os.path.isdir(steambox_user_dir):
             os.makedirs(steambox_user_dir, 0755)
