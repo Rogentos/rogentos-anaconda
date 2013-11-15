@@ -398,8 +398,6 @@ class SabayonInstall:
         return 0
 
     def _configure_steambox(self):
-        if not Entropy.is_sabayon_steambox():
-            return
 
         steambox_user_file = self._root + "/etc/rogentos/steambox-user"
         steambox_user_dir = os.path.dirname(steambox_user_file)
@@ -520,6 +518,8 @@ class SabayonInstall:
             rc-update del sabayon-mce boot
             rc-update del sabayon-mce default
             systemctl --no-reload disable sabayon-mce.service
+        else
+            systemctl --no-reload enable NetworkManager-wait-online.service
         fi
 
         cd /etc/init.d && ln -s net.lo net.eth0
