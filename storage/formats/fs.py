@@ -1058,6 +1058,15 @@ class EFIFS(FATFS):
     _mountType = "vfat"
     _modules = ["vfat"]
     _name = "EFI System Partition"
+
+    # NOTE: mount options inherited from FATFS
+    # NOTE: the sync option is a huge performance penalty but given
+    # the typical use cases for the EFI System Partition it's not
+    # a big deal. We gain that it will be harded to have a corrupted
+    # boot partition and this is quite important for broken firmwares
+    # that read the dirty flag and decide to wipe all the boot entries
+    # because of that.
+    _defaultMountOptions = ["umask=0077", "shortname=winnt", "sync"]
     _minSize = 50
     _maxSize = 256
     _bootable = True
@@ -1077,6 +1086,7 @@ class BTRFS(FS):
     """ btrfs filesystem """
     _type = "btrfs"
     _mkfs = "mkfs.btrfs"
+    _defaultFormatOptions = ["-f"]
     _modules = ["btrfs"]
     _resizefs = "btrfsctl"
     _formattable = True
