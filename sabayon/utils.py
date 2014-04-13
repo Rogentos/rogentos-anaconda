@@ -541,74 +541,45 @@ class SabayonInstall:
 
         # Remove Installer services
         config_script = """\
-        rc-update del installer-gui boot default
-        rc-update del installer-text boot default
         systemctl --no-reload disable installer-gui.service
         systemctl --no-reload disable installer-text.service
 
-        rc-update del rogentoslive boot default
         systemctl --no-reload disable rogentoslive.service
         systemctl --no-reload enable x-setup.service
 
-        rc-update add vixie-cron default
         systemctl --no-reload enable vixie-cron.service
 
-        rc-update del music boot default
         systemctl --no-reload disable music.service
 
-        rc-update add nfsmount default
-
-        rc-update del cdeject shutdown
         systemctl --no-reload disable cdeject.service
 
-        rc-update add oemsystem-boot boot
-        rc-update add oemsystem-default default
         systemctl --no-reload enable oemsystem.service
 
-        rc-update add dmcrypt boot
-
         if [ "0" = """+is_sabayon_mce+""" ]; then
-            rc-update del sabayon-mce boot
-            rc-update del sabayon-mce default
             systemctl --no-reload disable sabayon-mce.service
         else
             systemctl --no-reload enable NetworkManager-wait-online.service
         fi
-
-        cd /etc/init.d && ln -s net.lo net.eth0
         """
         self.spawn_chroot(config_script, silent = True)
 
         if self.is_virtualbox():
             self.spawn_chroot("""\
-            rc-update add virtualbox-guest-additions boot
             systemctl --no-reload enable virtualbox-guest-additions.service
             """, silent = True)
         else:
             self.spawn_chroot("""\
-            rc-update del virtualbox-guest-additions boot
             systemctl --no-reload disable virtualbox-guest-additions.service
             """, silent = True)
 
         if self._is_firewall_enabled():
             self.spawn_chroot("""\
-            rc-update add %s default
             systemctl --no-reload enable %s.service
-            """ % (FIREWALL_SERVICE, FIREWALL_SERVICE,), silent = True)
+            """ % (FIREWALL_SERVICE,), silent = True)
         else:
             self.spawn_chroot("""\
-            rc-update del %s boot default
             systemctl --no-reload disable %s.service
-            """ % (FIREWALL_SERVICE, FIREWALL_SERVICE,), silent = True)
-
-        if self._is_systemd_running():
-            self.spawn_chroot("""\
-            eselect init set systemd
-            """, silent = True)
-        elif self._is_openrc_running():
-            self.spawn_chroot("""\
-            eselect init set sysvinit
-            """, silent = True)
+            """ % (FIREWALL_SERVICE,), silent = True)
 
         # XXX: hack
         # For GDM, set DefaultSession= to /etc/skel/.dmrc value
@@ -641,7 +612,6 @@ class SabayonInstall:
         Detect a possible OSS video card and remove /etc/env.d/*ati
         """
         bb_enabled = os.path.exists("/tmp/.bumblebee.enabled")
-        radeon_kms_enabled = os.path.exists("/tmp/.radeon.kms")
 
         xorg_x11 = self._get_opengl() == "xorg-x11"
 
@@ -658,25 +628,9 @@ class SabayonInstall:
             self.remove_package('nvidia-drivers', silent = True)
             self.remove_package('nvidia-userspace', silent = True)
 
-        # created by gpu-detector
-        if radeon_kms_enabled:
-            # (<3.6.0 kernel) since CONFIG_DRM_RADEON_KMS=n on our kernel
-            # we need to force radeon to load at boot
-            modules_conf = self._root + "/etc/conf.d/modules"
-            with open(modules_conf, "a+") as mod_f:
-                mod_f.write("\n")
-                mod_f.write("""\
-# Added by the RogentOS Installer to force radeon.ko to load
-# since CONFIG_DRM_RADEON_KMS is not enabled by default at
-# this time.
-modules="radeon"
-module_radeon_args="modeset=1"
-""")
-
         # bumblebee support
         if bb_enabled:
             bb_script = """
-            rc-update add bumblebee default
             systemctl --no-reload enable bumblebeed.service
             """
             self.spawn_chroot(bb_script, silent = True)
@@ -754,20 +708,10 @@ blacklist nouveau
             os._exit(proc.wait())
 
     def setup_manual_networking(self):
-        mn_script = """
-            rc-update del NetworkManager default
-            rc-update del NetworkManager-setup default
-            rc-update del avahi-daemon default
-            rc-update del dhcdbd default
-            if [ -f "/etc/rc.conf" ]; then
-                sed -i 's/^#rc_hotplug=".*"/rc_hotplug="*"/g' /etc/rc.conf
-                sed -i 's/^rc_hotplug=".*"/rc_hotplug="*"/g' /etc/rc.conf
-            fi
-        """
         # TODO: check if we need this with systemd. I'd say no.
         # systemctl --no-reload disable NetworkManager.service
         # systemctl --no-reload disable NetworkManager-wait-online.service
-        self.spawn_chroot(mn_script, silent = True)
+        pass
 
     def get_keyboard_layout(self):
         console_kbd = self._anaconda.keyboard.get()
@@ -873,25 +817,6 @@ blacklist nouveau
         shutil.copy2(live_xorg_conf, xorg_conf+".original")
 
     def _setup_consolefont(self, system_font):
-        consolefont_conf = self._root + "/etc/conf.d/consolefont"
-        content = []
-        with open(consolefont_conf, "r") as con_f:
-            while True:
-                line = con_f.readline()
-                if not line:
-                    break
-                if line.startswith("consolefont="):
-                    line = "consolefont=\"%s\"\n" % (system_font,)
-                    found = True
-                content.append(line)
-            if not found:
-                content.append("consolefont=\"%s\"\n" % (system_font,))
-
-        with open(consolefont_conf, "w") as con_f:
-            for line in content:
-                con_f.write(line)
-            con_f.flush()
-
         # /etc/vconsole.conf support
         vconsole_conf = self._root + "/etc/vconsole.conf"
         content = []

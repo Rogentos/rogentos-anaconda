@@ -294,13 +294,6 @@ setup_language() {
         done
     fi
 
-    # copy consolefont over from live system as well
-    local console_file="/etc/conf.d/consolefont"
-    local chroot_console_file="${_chroot}/${console_file}"
-    if [ -f "${console_file}" ]; then
-        cat "${console_file}" > "${chroot_console_file}" || return ${?}
-    fi
-
     return 0 # ignore failures in the loop above
 }
 
@@ -311,23 +304,11 @@ setup_network() {
     local _chroot="${1}"
 
     if [ "${NM_NETWORK}" = "1" ]; then
-        exec_chroot "${_chroot}" rc-update del \
-            netmount default
-        exec_chroot "${_chroot}" rc-update del \
-            nfsmount default
         sd_enable "${_chroot}" NetworkManager
     else
-        exec_chroot "${_chroot}" rc-update del \
-            NetworkManager default
-        exec_chroot "${_chroot}" rc-update del \
-            NetworkManager-setup default
         sd_disable "${_chroot}" NetworkManager
         sd_disable "${_chroot}" NetworkManager-wait-online
 
-        exec_chroot "${_chroot}" rc-update del \
-            avahi-daemon default
-        exec_chroot "${_chroot}" rc-update del \
-            dhcdbd default
         sd_disable "${_chroot}" NetworkManager
         sd_disable "${_chroot}" NetworkManager-wait-online
 
@@ -351,12 +332,6 @@ setup_keyboard() {
     local _chroot="${1}"
 
     local _key_map="us"  # default to US keymap
-    local key_file="/etc/conf.d/keymaps"
-    local chroot_key_file="${_chroot}/${key_file}"
-    if [ -f "${key_file}" ]; then
-        _key_map=$(. "${key_file}" && echo "${keymap}")
-        cat "${key_file}" > "${chroot_key_file}" || return ${?}
-    fi
 
     # run keyboard-setup directly inside chroot
     local opt
@@ -440,26 +415,7 @@ _remove_proprietary_drivers() {
         fi
     fi
 
-    local _mod_conf="/etc/conf.d/modules"
-    local chroot_mod_conf="${_chroot}/${_mod_conf}"
-    # created by gpu-detector
-    if [ -f "/tmp/.radeon.kms" ]; then
-        # (<3.6.0 kernel) since CONFIG_DRM_RADEON_KMS=n on our kernel
-        # we need to force radeon to load at boot
-        echo >> "${chroot_mod_conf}" || return ${?}
-        echo "# Added by the Rogentos Installer to force radeon.ko load" \
-            >> "${chroot_mod_conf}" || return ${?}
-        echo "# since CONFIG_DRM_RADEON_KMS is not enabled by default at" \
-            >> "${chroot_mod_conf}" || return ${?}
-        echo "# this time" >> "${chroot_mod_conf}" || return ${?}
-        echo "modules=\"radeon\"" >> "${chroot_mod_conf}" || return ${?}
-        echo "module_radeon_args=\"modeset=1\"" \
-            >> "${chroot_mod_conf}" || return ${?}
-    fi
-
     if [ "${bb_enabled}" = "1" ]; then
-        exec_chroot "${_chroot}" \
-            rc-update add bumblebee default
         sd_enable "${_chroot}" bumblebeed
     fi
 }
@@ -642,66 +598,28 @@ setup_services() {
     )
     local srv=
     for srv in "${srvs[@]}"; do
-        exec_chroot "${_chroot}" \
-            rc-update del ${srv} boot default &>/dev/null
         sd_disable "${_chroot}" ${srv}
     done
 
-    exec_chroot "${_chroot}" \
-        rc-update add vixie-cron default &> /dev/null
     sd_enable "${_chroot}" vixie-cron
 
-    if [ ! -e "${_chroot}/etc/init.d/net.eth0" ]; then
-        ln -sf net.lo "${_chroot}/etc/init.d/net.eth0" || return ${?}
-    fi
+    sd_disable "${_chroot}" cdeject &> /dev/null # may not be avail.
 
-    if [ -e "${_chroot}/etc/init.d/nfsmount" ]; then
-        exec_chroot "${_chroot}" \
-            rc-update add nfsmount default
-    fi
-    if [ -e "${_chroot}/etc/init.d/cdeject" ]; then
-        exec_chroot "${_chroot}" \
-            rc-update del cdeject shutdown
-        sd_disable "${_chroot}" cdeject
-    fi
-    if [ -e "${_chroot}/etc/init.d/oemsystem-boot" ]; then
-        exec_chroot "${_chroot}" \
-            rc-update add oemsystem-boot boot
-    fi
-    if [ -e "${_chroot}/etc/init.d/oemsystem-default" ]; then
-        exec_chroot "${_chroot}" \
-            rc-update add oemsystem-default default
-    fi
     sd_enable "${_chroot}" oemsystem &> /dev/null # may not be avail.
 
     if [ "${SABAYON_MCE}" = "0" ]; then
-        exec_chroot "${_chroot}" \
-            rc-update del sabayon-mce boot default &>/dev/null
         sd_disable "${_chroot}" sabayon-mce
     fi
 
-    if [ -e "${_chroot}/etc/init.d/dmcrypt" ]; then
-        exec_chroot "${_chroot}" \
-            rc-update add dmcrypt boot
-    fi
-
     if _is_virtualbox; then
-        exec_chroot "${_chroot}" \
-            rc-update add virtualbox-guest-additions boot &>/dev/null
         sd_enable "${_chroot}" virtualbox-guest-additions
     else
-        exec_chroot "${_chroot}" \
-            rc-update del virtualbox-guest-additions boot &>/dev/null
         sd_disable "${_chroot}" virtualbox-guest-additions
     fi
 
     if [ "${FIREWALL}" = "1" ]; then
-        exec_chroot "${_chroot}" \
-            rc-update add "${FIREWALL_SERVICE}" default
         sd_enable "${_chroot}" "${FIREWALL_SERVICE}"
     else
-        exec_chroot "${_chroot}" \
-            rc-update del "${FIREWALL_SERVICE}" boot default &>/dev/null
         sd_disable "${_chroot}" "${FIREWALL_SERVICE}"
     fi
 
