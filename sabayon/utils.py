@@ -959,13 +959,13 @@ blacklist nouveau
 
             if os.access(mask_file, os.W_OK) and os.path.isfile(mask_file):
                 with open(mask_file,"aw") as f:
-                    f.write("\n# added by the RogentOS Installer\n")
+                    f.write("\n# added by the Kogaion Installer\n")
                     f.write("x11-drivers/nvidia-drivers\n")
                     f.write("x11-drivers/nvidia-userspace\n")
 
             if os.access(unmask_file, os.W_OK) and os.path.isfile(unmask_file):
                 with open(unmask_file, "aw") as f:
-                    f.write("\n# added by the RogentOS Installer\n")
+                    f.write("\n# added by the Kogaion Installer\n")
                     for dep in matches:
                         f.write("%s\n" % (dep,))
 
@@ -985,7 +985,7 @@ blacklist nouveau
         return webserv
 
     def emit_install_done(self):
-        # user installed RogentOS, w00hooh!
+        # user installed Kogaion, w00hooh!
         try:
             webserv = self._get_entropy_webservice()
         except WebService.UnsupportedService:

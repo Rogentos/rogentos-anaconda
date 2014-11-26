@@ -30,7 +30,7 @@ QUSER_PASS=${QUSER_PASS:-geek}
 QROOT_PASS=${QROOT_PASS:-keeg}
 # NetworkManager networking? "1" for Yes, "0" for No
 NM_NETWORK="${NM_NETWORK:-1}"
-# RogentOS Media Center mode? "1" for Yes, "0" for No
+# Kogaion Media Center mode? "1" for Yes, "0" for No
 SABAYON_MCE="${SABAYON_MCE:-0}"
 # Firewall configuration, enable firewall? "1" for Yes, "0" for No
 FIREWALL="${FIREWALL:-1}"

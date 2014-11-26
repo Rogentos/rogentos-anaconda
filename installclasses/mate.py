@@ -42,7 +42,7 @@ class InstallClass(BaseInstallClass):
         if os.path.isfile(_pix_path):
             pixmap = _pix_path
 
-    name = N_("RogentOS MATE Desktop")
+    name = N_("Kogaion MATE Desktop")
     dmrc = "mate"
     if Entropy().is_sabayon_steambox():
         dmrc = "steambox"
