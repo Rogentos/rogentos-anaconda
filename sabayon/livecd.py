@@ -106,14 +106,14 @@ class LiveCDCopyBackend(backend.AnacondaBackend):
         anaconda.dispatch.skipStep("instbootloader", skip = 1)
 
         if self._bootloader_recovery:
-            log.info("Preparing to recover Rogentos")
-            self._progress.set_label(_("Recovering Rogentos."))
+            log.info("Preparing to recover Kogaion")
+            self._progress.set_label(_("Recovering Kogaion."))
             self._progress.set_fraction(0.0)
             return
         else:
-            log.info("Preparing to install Rogentos")
+            log.info("Preparing to install Kogaion")
 
-        self._progress.set_label(_("Installing Rogentos onto hard drive."))
+        self._progress.set_label(_("Installing Kogaion onto hard drive."))
         self._progress.set_fraction(0.0)
 
         # Actually install
@@ -126,7 +126,7 @@ class LiveCDCopyBackend(backend.AnacondaBackend):
             self._sabayon_install.setup_manual_networking()
         self._sabayon_install.setup_keyboard()
 
-        action = _("Configuring Rogentos")
+        action = _("Configuring Kogaion")
         self._progress.set_label(action)
         self._progress.set_fraction(0.7)
 
@@ -155,7 +155,7 @@ class LiveCDCopyBackend(backend.AnacondaBackend):
             with open(var_tmp_keep, "w") as wt:
                 wt.flush()
 
-        action = _("Rogentos configuration complete")
+        action = _("Kogaion configuration complete")
         self._progress.set_label(action)
 
     def doPostInstall(self, anaconda):

@@ -40,7 +40,7 @@ for arg in $*; do
 done
 [[ -z "${DISPLAY}" ]] && DO_TEXT="1"
 
-export ANACONDA_PRODUCTNAME="Rogentos"
+export ANACONDA_PRODUCTNAME="Kogaion"
 export ANACONDA_PRODUCTVERSION="$(cat /etc/kogaion-release | cut -d' ' -f 4)"
 export ANACONDA_PRODUCTPATH="/mnt/livecd"
 export ANACONDA_CHROOTPATH="/mnt/sysimage"

@@ -2060,7 +2060,7 @@ msgid "Checking dependencies in packages selected for installation"
 msgstr "Po kontrollohen varësitë në paketat e përzgjedhura për instalim"
 
 #: installclasses/corecd.py:38
-msgid "Rogentos Core CD"
+msgid "Kogaion Core CD"
 msgstr ""
 
 #: installclasses/corecd.py:48
@@ -2071,7 +2071,7 @@ msgid ""
 msgstr ""
 
 #: installclasses/fluxbox.py:38
-msgid "Rogentos Fluxbox"
+msgid "Kogaion Fluxbox"
 msgstr ""
 
 #: installclasses/fluxbox.py:47
@@ -2082,7 +2082,7 @@ msgid ""
 msgstr ""
 
 #: installclasses/gnome.py:45
-msgid "Rogentos GNOME Desktop"
+msgid "Kogaion GNOME Desktop"
 msgstr ""
 
 #: installclasses/gnome.py:47
@@ -2093,7 +2093,7 @@ msgid ""
 msgstr ""
 
 #: installclasses/kde.py:38
-msgid "Rogentos KDE"
+msgid "Kogaion KDE"
 msgstr ""
 
 #: installclasses/kde.py:47
@@ -6855,21 +6855,21 @@ msgstr ""
 
 #: sabayon/livecd.py:108
 #, fuzzy
-msgid "Recovering Rogentos."
+msgid "Recovering Kogaion."
 msgstr "Formësim VNC-je"
 
 #: sabayon/livecd.py:114
 #, fuzzy
-msgid "Installing Rogentos onto hard drive."
+msgid "Installing Kogaion onto hard drive."
 msgstr "Po instalohet nisjengarkuesi."
 
 #: sabayon/livecd.py:128
 #, fuzzy
-msgid "Configuring Rogentos"
+msgid "Configuring Kogaion"
 msgstr "Formësim VNC-je"
 
 #: sabayon/livecd.py:158
-msgid "Rogentos configuration complete"
+msgid "Kogaion configuration complete"
 msgstr ""
 
 #: sabayon/utils.py:405

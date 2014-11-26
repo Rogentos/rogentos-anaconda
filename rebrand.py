@@ -46,8 +46,8 @@ def globReplace(map,dirname):
     return
 
 caseMap=[]
-caseMap.append(('SABAYON','ROGENTOS'))
-caseMap.append(('Sabayon','Rogentos'))
+caseMap.append(('SABAYON','Kogaion'))
+caseMap.append(('Sabayon','Kogaion'))
 caseMap.append(('sabayon','kogaion'))
 
 matches = []

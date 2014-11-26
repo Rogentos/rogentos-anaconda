@@ -2086,32 +2086,32 @@ msgid "Checking dependencies in packages selected for installation"
 msgstr "Controllo delle dipendenze dei pacchetti selezionati per l'installazione"
 
 #: installclasses/corecd.py:38
-msgid "Rogentos Core CD"
-msgstr "Rogentos Core CD"
+msgid "Kogaion Core CD"
+msgstr "Kogaion Core CD"
 
 #: installclasses/corecd.py:48
 msgid "Select this installation type to just install a Core System without graphical applications. This is the best choice for Server-oriented deployments."
 msgstr "Seleziona questo metodo di installazione per installare un sistema Core, senza applicazioni grafiche. Questa è la migliore scelta per un sistema Server."
 
 #: installclasses/fluxbox.py:38
-msgid "Rogentos Fluxbox"
-msgstr "Rogentos Fluxbox"
+msgid "Kogaion Fluxbox"
+msgstr "Kogaion Fluxbox"
 
 #: installclasses/fluxbox.py:47
 msgid "Select this installation type for a default installation with the Fluxbox geeky minimal environment. After this installation process you will be able to install additional packages."
 msgstr "Seleziona questa modalità per una installazione con l'ambiente minimale Fluxbox. Dopo l'installazione potrai aggiungere pacchetti addizionali."
 
 #: installclasses/gnome.py:45
-msgid "Rogentos GNOME Desktop"
-msgstr "Rogentos GNOME Desktop"
+msgid "Kogaion GNOME Desktop"
+msgstr "Kogaion GNOME Desktop"
 
 #: installclasses/gnome.py:47
 msgid "Select this installation type for a default installation with the GNOME desktop environment. After this installation process you will be able to install additional packages."
 msgstr "Seleziona questo tipo di installazione per usare l'ambiente desktop GNOME. Potrai installare ulteriori pacchetti in seguito."
 
 #: installclasses/kde.py:38
-msgid "Rogentos KDE"
-msgstr "Rogentos KDE"
+msgid "Kogaion KDE"
+msgstr "Kogaion KDE"
 
 #: installclasses/kde.py:47
 msgid "Select this installation type for a default installation with the KDE desktop environment. After this installation process you will be able to install additional packages."
@@ -6367,20 +6367,20 @@ msgid "The given location [%s] isn't a valid %s live CD to use as an installatio
 msgstr "La locazione data non è un valido live CD %s da usare come sorgente d'installazione."
 
 #: sabayon/livecd.py:108
-msgid "Recovering Rogentos."
-msgstr "Ripristino Rogentos."
+msgid "Recovering Kogaion."
+msgstr "Ripristino Kogaion."
 
 #: sabayon/livecd.py:114
-msgid "Installing Rogentos onto hard drive."
-msgstr "Installazione Rogentos su disco."
+msgid "Installing Kogaion onto hard drive."
+msgstr "Installazione Kogaion su disco."
 
 #: sabayon/livecd.py:128
-msgid "Configuring Rogentos"
-msgstr "Configurazione Rogentos"
+msgid "Configuring Kogaion"
+msgstr "Configurazione Kogaion"
 
 #: sabayon/livecd.py:158
-msgid "Rogentos configuration complete"
-msgstr "Configurazione Rogentos completata"
+msgid "Kogaion configuration complete"
+msgstr "Configurazione Kogaion completata"
 
 #: sabayon/utils.py:405
 msgid "Configuring System Services"

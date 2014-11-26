@@ -42,7 +42,7 @@ class InstallClass(BaseInstallClass):
         if os.path.isfile(_pix_path):
             pixmap = _pix_path
 
-    name = N_("Rogentos GNOME Desktop")
+    name = N_("Kogaion GNOME Desktop")
 
     dmrc = "gnome"
     if Entropy().is_sabayon_steambox():

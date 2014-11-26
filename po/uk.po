@@ -2095,8 +2095,8 @@ msgid "Checking dependencies in packages selected for installation"
 msgstr "Перевірка залежностей вибраних для встановлення пакунків"
 
 #: installclasses/corecd.py:38
-msgid "Rogentos Core CD"
-msgstr "Диск Rogentos"
+msgid "Kogaion Core CD"
+msgstr "Диск Kogaion"
 
 #: installclasses/corecd.py:48
 msgid ""
@@ -2108,8 +2108,8 @@ msgstr ""
 "графічних додатків. Це кращий вибір для серверно-орієнтованих об'єктів."
 
 #: installclasses/fluxbox.py:38
-msgid "Rogentos Fluxbox"
-msgstr "Rogentos Fluxbox"
+msgid "Kogaion Fluxbox"
+msgstr "Kogaion Fluxbox"
 
 #: installclasses/fluxbox.py:47
 msgid ""
@@ -2122,8 +2122,8 @@ msgstr ""
 "пакунки."
 
 #: installclasses/gnome.py:45
-msgid "Rogentos GNOME Desktop"
-msgstr "Стільничне середовище Rogentos GNOME"
+msgid "Kogaion GNOME Desktop"
+msgstr "Стільничне середовище Kogaion GNOME"
 
 #: installclasses/gnome.py:47
 msgid ""
@@ -2135,8 +2135,8 @@ msgstr ""
 "встановлення можна буде довантажити додаткові пакунки."
 
 #: installclasses/kde.py:38
-msgid "Rogentos KDE"
-msgstr "Стільничне середовище Rogentos KDE"
+msgid "Kogaion KDE"
+msgstr "Стільничне середовище Kogaion KDE"
 
 #: installclasses/kde.py:47
 msgid ""
@@ -6915,20 +6915,20 @@ msgid ""
 msgstr "Вказаний шлях [%s] не є коректним %s live CD для встановлення."
 
 #: sabayon/livecd.py:108
-msgid "Recovering Rogentos."
-msgstr "Відновлення Rogentos."
+msgid "Recovering Kogaion."
+msgstr "Відновлення Kogaion."
 
 #: sabayon/livecd.py:114
-msgid "Installing Rogentos onto hard drive."
-msgstr "Завантаження Rogentos на жорсткий диск."
+msgid "Installing Kogaion onto hard drive."
+msgstr "Завантаження Kogaion на жорсткий диск."
 
 #: sabayon/livecd.py:128
-msgid "Configuring Rogentos"
-msgstr "Налаштовування Rogentos"
+msgid "Configuring Kogaion"
+msgstr "Налаштовування Kogaion"
 
 #: sabayon/livecd.py:158
-msgid "Rogentos configuration complete"
-msgstr "Налаштування Rogentos завершено"
+msgid "Kogaion configuration complete"
+msgstr "Налаштування Kogaion завершено"
 
 #: sabayon/utils.py:405
 msgid "Configuring System Services"

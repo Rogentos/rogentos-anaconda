@@ -1,7 +1,7 @@
 #!/bin/bash
 #
 # quickinst.sh
-# Rogentos non-interactive install-to-chroot script
+# Kogaion non-interactive install-to-chroot script
 #
 # Copyright (C) 2012 Fabio Erculiani
 #
@@ -353,7 +353,7 @@ setup_sudo() {
     if [ -f "${chroot_sudo_file}" ]; then
         sed -i "/NOPASSWD/ s/^#//" "${chroot_sudo_file}" || return ${?}
         echo >> "${chroot_sudo_file}" || return ${?}
-        echo "# Added by Rogentos Alt Installer" \
+        echo "# Added by Kogaion Alt Installer" \
             >> "${chroot_sudo_file}" || return ${?}
         echo "%wheel  ALL=ALL" \
             >> "${chroot_sudo_file}" || return ${?}

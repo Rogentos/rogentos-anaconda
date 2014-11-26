@@ -31,7 +31,7 @@ import logging
 log = logging.getLogger("anaconda")
 
 # Because of some tweaks, anaconda forgets to update groups list, leaving
-# it empty. So, Rogentos uses a temporary "solution" to fix this problem
+# it empty. So, Kogaion uses a temporary "solution" to fix this problem
 # by forcely extending the usually empty groups list with our list.
 
 # list to extend with

@@ -2088,36 +2088,36 @@ msgid "Checking dependencies in packages selected for installation"
 msgstr "Verificando dependências dos pacotes selecionados para instalação"
 
 #: installclasses/corecd.py:38
-msgid "Rogentos Core CD"
-msgstr "CD do Rogentos Core"
+msgid "Kogaion Core CD"
+msgstr "CD do Kogaion Core"
 
 #: installclasses/corecd.py:48
 msgid "Select this installation type to just install a Core System without graphical applications. This is the best choice for Server-oriented deployments."
 msgstr "Selecione este tipo se você quer um  sistema básico, sem aplicativos gráficos. Pode ser a melhor escolha para um servidor."
 
 #: installclasses/fluxbox.py:38
-msgid "Rogentos Fluxbox"
-msgstr "Rogentos com Fluxbox"
+msgid "Kogaion Fluxbox"
+msgstr "Kogaion com Fluxbox"
 
 #: installclasses/fluxbox.py:47
 msgid "Select this installation type for a default installation with the Fluxbox geeky minimal environment. After this installation process you will be able to install additional packages."
 msgstr "Selecione este tipo para uma instalação apenas com Fluxbox. Depois de instalado, você poderá adicionar outros pacotes."
 
 #: installclasses/gnome.py:45
-msgid "Rogentos GNOME Desktop"
-msgstr "Rogentos com Desktop GNOME"
+msgid "Kogaion GNOME Desktop"
+msgstr "Kogaion com Desktop GNOME"
 
 #: installclasses/gnome.py:47
 msgid "Select this installation type for a default installation with the GNOME desktop environment. After this installation process you will be able to install additional packages."
 msgstr "Escolha este tipo para instalar um kogaion com GNOME. depois da instalação, poderá adicionar KDE ou outras coisas."
 
 #: installclasses/kde.py:38
-msgid "Rogentos KDE"
-msgstr "Rogentos com KDE"
+msgid "Kogaion KDE"
+msgstr "Kogaion com KDE"
 
 #: installclasses/kde.py:47
 msgid "Select this installation type for a default installation with the KDE desktop environment. After this installation process you will be able to install additional packages."
-msgstr "Selecione este tipo para obter um Rogentos com KDE. Após a instalação completada, poderá adicionar GNOME e quaisquer outros pacotes."
+msgstr "Selecione este tipo para obter um Kogaion com KDE. Após a instalação completada, poderá adicionar GNOME e quaisquer outros pacotes."
 
 #: iw/GroupSelector.py:147
 #, python-format
@@ -6364,20 +6364,20 @@ msgid "The given location [%s] isn't a valid %s live CD to use as an installatio
 msgstr "O caminho [%s] não é válido para o %s live CD a ser usado na instalação"
 
 #: sabayon/livecd.py:108
-msgid "Recovering Rogentos."
-msgstr "Recuperando o Rogentos."
+msgid "Recovering Kogaion."
+msgstr "Recuperando o Kogaion."
 
 #: sabayon/livecd.py:114
-msgid "Installing Rogentos onto hard drive."
-msgstr "Instalando o Rogentos no disco rígido."
+msgid "Installing Kogaion onto hard drive."
+msgstr "Instalando o Kogaion no disco rígido."
 
 #: sabayon/livecd.py:128
-msgid "Configuring Rogentos"
-msgstr "Configurando o Rogentos"
+msgid "Configuring Kogaion"
+msgstr "Configurando o Kogaion"
 
 #: sabayon/livecd.py:158
-msgid "Rogentos configuration complete"
-msgstr "Rogentos completamente instalado "
+msgid "Kogaion configuration complete"
+msgstr "Kogaion completamente instalado "
 
 #: sabayon/utils.py:405
 msgid "Configuring System Services"
