@@ -234,7 +234,7 @@ ASIAN_FONTS_PACKAGES = ["@ime-fonts-support", "@ime-fonts"]
 FIREWALL_PACKAGE = "net-firewall/ufw"
 FIREWALL_SERVICE = "ufw"
 
-LIVE_USER = "rogentosuser"
+LIVE_USER = "kogaionuser"
 REPO_NAME = "sabayonlinux.org"
 
 SB_PRIVATE_KEY = "/boot/SecureBoot/user-private.key"

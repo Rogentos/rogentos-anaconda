@@ -37,7 +37,7 @@ FIREWALL="${FIREWALL:-1}"
 
 ## Global variables that one wouldn't normally want to modify
 # Live Image default user name
-LIVE_USER="${LIVE_USER:-rogentosuser}"
+LIVE_USER="${LIVE_USER:-kogaionuser}"
 # Source path - where to copy data from
 SRCROOT=${SRCROOT:-/mnt/livecd}
 # Name of the firewall service
@@ -229,8 +229,8 @@ configure_skel() {
     done
 
     # Install welcome loader
-    local welcome_name="rogentos-welcome-loader.desktop"
-    local welcome_desktop="${_chroot}/etc/rogentos/${welcome_name}"
+    local welcome_name="kogaion-welcome-loader.desktop"
+    local welcome_desktop="${_chroot}/etc/kogaion/${welcome_name}"
     if [ -f "${welcome_desktop}" ]; then
         cp -p "${welcome_desktop}" "${_autost_dir}/${welcome_name}" \
             || return ${?}
@@ -594,7 +594,7 @@ setup_services() {
         "installer-gui"
         "installer-text"
         "music"
-        "rogentoslive"
+        "kogaionlive"
     )
     local srv=
     for srv in "${srvs[@]}"; do

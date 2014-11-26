@@ -2109,7 +2109,7 @@ msgstr "Rogentos com Desktop GNOME"
 
 #: installclasses/gnome.py:47
 msgid "Select this installation type for a default installation with the GNOME desktop environment. After this installation process you will be able to install additional packages."
-msgstr "Escolha este tipo para instalar um rogentos com GNOME. depois da instalação, poderá adicionar KDE ou outras coisas."
+msgstr "Escolha este tipo para instalar um kogaion com GNOME. depois da instalação, poderá adicionar KDE ou outras coisas."
 
 #: installclasses/kde.py:38
 msgid "Rogentos KDE"

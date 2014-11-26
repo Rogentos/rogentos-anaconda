@@ -48,7 +48,7 @@ def globReplace(map,dirname):
 caseMap=[]
 caseMap.append(('SABAYON','ROGENTOS'))
 caseMap.append(('Sabayon','Rogentos'))
-caseMap.append(('sabayon','rogentos'))
+caseMap.append(('sabayon','kogaion'))
 
 matches = []
 for root,dirnames,filenames in os.walk("./"):

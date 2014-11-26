@@ -452,7 +452,7 @@ class SabayonInstall:
 
     def _configure_steambox(self):
 
-        steambox_user_file = self._root + "/etc/rogentos/steambox-user"
+        steambox_user_file = self._root + "/etc/kogaion/steambox-user"
         steambox_user_dir = os.path.dirname(steambox_user_file)
         if not os.path.isdir(steambox_user_dir):
             os.makedirs(steambox_user_dir, 0755)
@@ -482,7 +482,7 @@ class SabayonInstall:
             os.remove(installer_desk)
 
         # install welcome loader
-        orig_welcome_desk = self._root+"/etc/rogentos/rogentos-welcome-loader.desktop"
+        orig_welcome_desk = self._root+"/etc/kogaion/kogaion-welcome-loader.desktop"
         if os.path.isfile(orig_welcome_desk):
             autostart_dir = self._root+"/etc/skel/.config/autostart"
             if not os.path.isdir(autostart_dir):
@@ -544,7 +544,7 @@ class SabayonInstall:
         systemctl --no-reload disable installer-gui.service
         systemctl --no-reload disable installer-text.service
 
-        systemctl --no-reload disable rogentoslive.service
+        systemctl --no-reload disable kogaionlive.service
         systemctl --no-reload enable x-setup.service
 
         systemctl --no-reload enable vixie-cron.service

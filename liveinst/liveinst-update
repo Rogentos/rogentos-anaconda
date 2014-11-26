@@ -1,7 +1,7 @@
 #!/bin/sh
 
 _fetch_ver="5"
-[[ -f "/etc/rogentos-edition" ]] && _fetch_ver=$(cat /etc/rogentos-edition | cut -d" " -f 3)
+[[ -f "/etc/kogaion-edition" ]] && _fetch_ver=$(cat /etc/kogaion-edition | cut -d" " -f 3)
 
 FETCH_VER=${FETCH_VER:-${_fetch_ver}}
 FETCH_FN="anaconda-${FETCH_VER}-$(uname -m).tar.bz2"
