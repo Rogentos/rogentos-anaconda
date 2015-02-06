@@ -268,8 +268,8 @@ msgstr "Si è verificato un errore durante il trasferimento dell'immagine d'inst
 #: textw/partition_text.py:273
 #: textw/upgrade_text.py:181
 #: textw/upgrade_text.py:188
-#: sabayon/livecd.py:476
-#: sabayon/utils.py:1005
+#: kogaion/livecd.py:476
+#: kogaion/utils.py:1005
 msgid "Error"
 msgstr "Errore"
 
@@ -330,7 +330,7 @@ msgstr ""
 #: storage/__init__.py:219
 #: storage/__init__.py:1966
 #: storage/dasd.py:139
-#: sabayon/livecd.py:483
+#: kogaion/livecd.py:483
 msgid "_Exit installer"
 msgstr "_Esci dal programma d'installazione"
 
@@ -629,7 +629,7 @@ msgstr "Uscita in corso"
 #: livecd.py:126
 #: text.py:271
 #: upgrade.py:228
-#: sabayon/livecd.py:69
+#: kogaion/livecd.py:69
 msgid "Exit installer"
 msgstr "Esci dall'installazione"
 
@@ -718,7 +718,7 @@ msgstr "_Riavvia"
 #: yuminstall.py:1469
 #: yuminstall.py:1487
 #: ui/anaconda.glade.h:2
-#: sabayon/livecd.py:482
+#: kogaion/livecd.py:482
 msgid "_Back"
 msgstr "_Indietro"
 
@@ -904,7 +904,7 @@ msgstr ""
 "%s"
 
 #: livecd.py:121
-#: sabayon/livecd.py:64
+#: kogaion/livecd.py:64
 msgid "Unable to find image"
 msgstr "Impossibile trovare l'immagine"
 
@@ -932,7 +932,7 @@ msgid "Performing post-installation filesystem changes.  This may take several m
 msgstr "Applicazione delle modifiche post-installazione al filesystem.  Potrebbero occorrere alcuni minuti."
 
 #: livecd.py:401
-#: sabayon/livecd.py:477
+#: kogaion/livecd.py:477
 #, python-format
 msgid "The root filesystem you created is not large enough for this live image (%.2f MB required)."
 msgstr "Il filesystem root appena creato non è abbastanza grande per questa immagine live (%.2f MB richiesti)."
@@ -1352,8 +1352,8 @@ msgstr "Avviare le interfacce di rete su questo sistema?"
 #: loader/driverdisk.c:676
 #: loader/hdinstall.c:206
 #: textw/constants_text.py:56
-#: sabayon/utils.py:928
-#: sabayon/utils.py:1172
+#: kogaion/utils.py:928
+#: kogaion/utils.py:1172
 msgid "Yes"
 msgstr "Sì"
 
@@ -1362,8 +1362,8 @@ msgstr "Sì"
 #: loader/driverdisk.c:666
 #: loader/driverdisk.c:676
 #: textw/constants_text.py:60
-#: sabayon/utils.py:928
-#: sabayon/utils.py:1172
+#: kogaion/utils.py:928
+#: kogaion/utils.py:1172
 msgid "No"
 msgstr "No"
 
@@ -6361,124 +6361,124 @@ msgstr "Welsh"
 msgid "Zulu"
 msgstr "Zulu"
 
-#: sabayon/livecd.py:65
+#: kogaion/livecd.py:65
 #, fuzzy, python-format
 msgid "The given location [%s] isn't a valid %s live CD to use as an installation source."
 msgstr "La locazione data non è un valido live CD %s da usare come sorgente d'installazione."
 
-#: sabayon/livecd.py:108
+#: kogaion/livecd.py:108
 msgid "Recovering Kogaion."
 msgstr "Ripristino Kogaion."
 
-#: sabayon/livecd.py:114
+#: kogaion/livecd.py:114
 msgid "Installing Kogaion onto hard drive."
 msgstr "Installazione Kogaion su disco."
 
-#: sabayon/livecd.py:128
+#: kogaion/livecd.py:128
 msgid "Configuring Kogaion"
 msgstr "Configurazione Kogaion"
 
-#: sabayon/livecd.py:158
+#: kogaion/livecd.py:158
 msgid "Kogaion configuration complete"
 msgstr "Configurazione Kogaion completata"
 
-#: sabayon/utils.py:405
+#: kogaion/utils.py:405
 msgid "Configuring System Services"
 msgstr "Configurazione Servizi"
 
-#: sabayon/utils.py:684
+#: kogaion/utils.py:684
 msgid "An issue occured while installing"
 msgstr ""
 
-#: sabayon/utils.py:686
+#: kogaion/utils.py:686
 msgid "Meh."
 msgstr "Meh."
 
-#: sabayon/utils.py:687
+#: kogaion/utils.py:687
 msgid "Drivers installation issue"
 msgstr "Problema di installazione drivers"
 
-#: sabayon/utils.py:716
+#: kogaion/utils.py:716
 msgid "System Installation"
 msgstr "Installazione Sistema"
 
-#: sabayon/utils.py:848
+#: kogaion/utils.py:848
 msgid "Cleaning packages"
 msgstr "Pulizia pacchetti"
 
-#: sabayon/utils.py:873
+#: kogaion/utils.py:873
 msgid "Cleaning package"
 msgstr "Pulizia pacchetto"
 
-#: sabayon/utils.py:917
+#: kogaion/utils.py:917
 msgid "Installation complete"
 msgstr "Installazione completata"
 
-#: sabayon/utils.py:925
+#: kogaion/utils.py:925
 msgid "The following language packs are available for download (you need Internet), would you like to install them?"
 msgstr "I language pack seguenti sono disponibili per il download (Internet richiesto), vuoi scaricarli?"
 
-#: sabayon/utils.py:929
+#: kogaion/utils.py:929
 msgid "Language packs download"
 msgstr "Scaricamento pacchetti lingua"
 
-#: sabayon/utils.py:950
+#: kogaion/utils.py:950
 msgid "No language packs are available for download, sorry!"
 msgstr "Nessun pacchetto lingua disponibile per il download, mi dispiace!"
 
-#: sabayon/utils.py:951
-#: sabayon/utils.py:961
+#: kogaion/utils.py:951
+#: kogaion/utils.py:961
 msgid "Language packs"
 msgstr "Pacchetti lingua"
 
-#: sabayon/utils.py:960
+#: kogaion/utils.py:960
 msgid "No language packs are available for install, sorry!"
 msgstr "Nessun pacchetto lingua è disponibile per l'installazione, mi dispiace!"
 
-#: sabayon/utils.py:970
+#: kogaion/utils.py:970
 msgid "Downloading package"
 msgstr "Scaricamento pacchetto"
 
-#: sabayon/utils.py:979
+#: kogaion/utils.py:979
 msgid "Installing package"
 msgstr "Installazione dei pacchetti"
 
-#: sabayon/utils.py:996
-#: sabayon/utils.py:1006
+#: kogaion/utils.py:996
+#: kogaion/utils.py:1006
 msgid "Reordering Entropy mirrors"
 msgstr "Riordinamento mirror Entropy."
 
-#: sabayon/utils.py:996
+#: kogaion/utils.py:996
 msgid "can take some time..."
 msgstr "può impiegare un po' di tempo..."
 
-#: sabayon/utils.py:1034
+#: kogaion/utils.py:1034
 msgid "No repositories specified in"
 msgstr "Nessuna repository specificata in"
 
-#: sabayon/utils.py:1036
-#: sabayon/utils.py:1041
-#: sabayon/utils.py:1048
+#: kogaion/utils.py:1036
+#: kogaion/utils.py:1041
+#: kogaion/utils.py:1048
 msgid "Repositories update"
 msgstr "Aggiornamento repository"
 
-#: sabayon/utils.py:1040
+#: kogaion/utils.py:1040
 msgid "Unhandled exception"
 msgstr "Eccezione non gestita"
 
-#: sabayon/utils.py:1047
+#: kogaion/utils.py:1047
 msgid "Cannot download repositories right now, no big deal"
 msgstr "Impossibile scaricare dalle repository al momento, non è un grosso problema"
 
-#: sabayon/utils.py:1170
+#: kogaion/utils.py:1170
 msgid "This medium contains many extra languages, would you like to keep them installed?"
 msgstr "Questo supporto contiene molte language pack extra, vuoi mantenerle sul sistema?"
 
-#: sabayon/utils.py:1173
+#: kogaion/utils.py:1173
 msgid "Language packs installation"
 msgstr "Installazione dei pacchetti lingua"
 
-#: sabayon/utils.py:1184
+#: kogaion/utils.py:1184
 msgid "Generating list of files to copy"
 msgstr "Generazione lista file da copiare"
 
