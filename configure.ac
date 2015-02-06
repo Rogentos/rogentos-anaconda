@@ -262,8 +262,8 @@ AC_CONFIG_FILES([Makefile
                  pixmaps/Makefile
                  pixmaps/rnotes/Makefile
                  po/Makefile.in
-                 kogaion/Makefile
-                 kogaion/quickinst/Makefile
+                 sabayon/Makefile
+                 sabayon/quickinst/Makefile
                  scripts/Makefile
                  storage/Makefile
                  storage/devicelibs/Makefile

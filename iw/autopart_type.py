@@ -225,14 +225,6 @@ class PartitionTypeWindow(InstallWindow):
         self.encryptButton.set_active(self.storage.encryptedAutoPart)
 
         self.buttonGroup = pixmapRadioButtonGroup()
-
-        ###( Dirty hack by nightsh )###
-        # 
-        # Trying to disable the unneeded partitioning options and leave only custom layout
-        # Next step would be to activate it by default, skipping this screen. I hope :-/
-        # 
-
-        """
         self.buttonGroup.addEntry("all", _("Use All Space"),
                                   pixmap=gui.readImageFromFile("partscheme-all.png"),
                                   descr=_("Removes all partitions on the selected "
@@ -261,7 +253,6 @@ class PartitionTypeWindow(InstallWindow):
                                           "uses only the unpartitioned space on the "
                                           "selected device(s), assuming you have enough "
                                           "free space available."))
-        """
         self.buttonGroup.addEntry("custom", _("Create Custom Layout"),
                                   pixmap=gui.readImageFromFile("partscheme-custom.png"),
                                   descr=_("Manually create your own custom layout on "
@@ -274,27 +265,20 @@ class PartitionTypeWindow(InstallWindow):
         self.table.attach(widget, 0, 1, 1, 2)
 
         # if not set in ks, use UI default
-        """
         if self.storage.clearPartType is None or self.storage.clearPartType == CLEARPART_TYPE_LINUX:
             self.buttonGroup.setCurrent("replace")
         elif self.storage.clearPartType == CLEARPART_TYPE_NONE:
             self.buttonGroup.setCurrent("freespace")
         elif self.storage.clearPartType == CLEARPART_TYPE_ALL:
             self.buttonGroup.setCurrent("all")
-       
-        if self.buttonGroup.getCurrent() == "custom":
-        """
-        
-        # make sure reviewButton is active and not sensitive
-        
-        self.buttonGroup.setCurrent("custom")
-        self.reviewButton.set_active(True)
-        self.reviewButton.set_sensitive(False)
-        self.encryptButton.set_sensitive(False)
-        
-        if self.prevrev == None:
-            self.prevrev = self.reviewButton.get_active()
 
-        self.getNext()
+        if self.buttonGroup.getCurrent() == "custom":
+            # make sure reviewButton is active and not sensitive
+            if self.prevrev == None:
+                self.prevrev = self.reviewButton.get_active()
+
+            self.reviewButton.set_active(True)
+            self.reviewButton.set_sensitive(False)
+            self.encryptButton.set_sensitive(False)
 
         return vbox
