@@ -533,7 +533,7 @@ _emit_install_done() {
 from entropy.client.interfaces import Client
 client = Client()
 factory = client.WebServices()
-webserv = factory.new('sabayonlinux.org')
+webserv = factory.new('rogentos.ro')
 webserv.add_downloads(['installer'])
 client.shutdown()
 "
@@ -608,7 +608,7 @@ setup_services() {
     sd_enable "${_chroot}" oemsystem &> /dev/null # may not be avail.
 
     if [ "${SABAYON_MCE}" = "0" ]; then
-        sd_disable "${_chroot}" sabayon-mce
+        sd_disable "${_chroot}" kogaion-mce
     fi
 
     if _is_virtualbox; then
@@ -703,7 +703,7 @@ setup_secureboot() {
     local _private="${_chroot}/boot/SecureBoot/user-private.key"
     local _public="${_chroot}/boot/SecureBoot/user-public.crt"
     # TODO(lxnay): assume that collisions do not happen
-    local _der="${efi_dir}/EFI/sabayon/enroll-this.cer"
+    local _der="${efi_dir}/EFI/kogaion/enroll-this.cer"
 
     local _dir=
     for path in "${_private}" "${_public}" "${_der}"; do
