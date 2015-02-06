@@ -156,7 +156,7 @@ ui/zfcp-config.glade.h
 lang-table.h
 
 # Sabayon stuff
-sabayon/const.py
-sabayon/__init__.py
-sabayon/livecd.py
-sabayon/utils.py
+kogaion/const.py
+kogaion/__init__.py
+kogaion/livecd.py
+kogaion/utils.py

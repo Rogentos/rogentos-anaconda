@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# sabayon/utils.py
+# kogaion/utils.py
 #
 # Copyright (C) 2010 Fabio Erculiani
 #

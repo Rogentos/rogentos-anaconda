@@ -1,4 +1,4 @@
-# sabayon/quickinst/Makefile.am for anaconda
+# kogaion/quickinst/Makefile.am for anaconda
 #
 # Copyright (C) 2012  Sabayon Linux
 #

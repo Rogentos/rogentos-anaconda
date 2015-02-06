@@ -1,4 +1,4 @@
-# sabayon/Makefile.am for anaconda
+# kogaion/Makefile.am for anaconda
 #
 # Copyright (C) 2009  Red Hat, Inc.
 #
