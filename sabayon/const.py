@@ -235,9 +235,9 @@ FIREWALL_PACKAGE = "net-firewall/ufw"
 FIREWALL_SERVICE = "ufw"
 
 LIVE_USER = "kogaionuser"
-REPO_NAME = "sabayonlinux.org"
+REPO_NAME = "kogaionlinux.org"
 
 SB_PRIVATE_KEY = "/boot/SecureBoot/user-private.key"
 SB_PUBLIC_X509 = "/boot/SecureBoot/user-public.crt"
 # look for collisions
-SB_PUBLIC_DER = "/boot/efi/EFI/sabayon/enroll-this.cer"
+SB_PUBLIC_DER = "/boot/efi/EFI/kogaion/enroll-this.cer"

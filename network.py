@@ -595,7 +595,7 @@ class Network:
 
         hostname = self.hostname
         if not self.hostname:
-            hostname = "sabayon"
+            hostname = "kogaion"
 
         # systemd uses /etc/hostname
         with open(instPath+"/etc/hostname", "w") as f:
