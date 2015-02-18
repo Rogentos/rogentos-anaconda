@@ -235,7 +235,7 @@ FIREWALL_PACKAGE = "net-firewall/ufw"
 FIREWALL_SERVICE = "ufw"
 
 LIVE_USER = "kogaionuser"
-REPO_NAME = "kogaionlinux.org"
+REPO_NAME = "kogaionlinux"
 
 SB_PRIVATE_KEY = "/boot/SecureBoot/user-private.key"
 SB_PUBLIC_X509 = "/boot/SecureBoot/user-public.crt"
