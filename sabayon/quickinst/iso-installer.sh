@@ -1,9 +1,10 @@
 #!/bin/bash
 
 # iso-installer.sh
-# Sabayon non-interactive install-to-chroot script, using ISO as source
+# Kogaion non-interactive install-to-chroot script, using ISO as source
 #
 # Copyright (C) 2012 Sławomir Nizio
+# Copyright (C) 2015 Rogentos Team
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
