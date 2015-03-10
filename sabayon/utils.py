@@ -293,7 +293,7 @@ class SabayonInstall:
 
     def install_package(self, atom, match = None, silent = False, fetch = False):
 
-        if silent and os.getenv('SABAYON_DEBUG'):
+        if silent and os.getenv('KOGAION_DEBUG'):
             silent = False
 
         chroot = self._root
@@ -349,7 +349,7 @@ class SabayonInstall:
 
     def remove_package(self, atom, match = None, silent = False):
 
-        if silent and os.getenv('SABAYON_DEBUG'):
+        if silent and os.getenv('KOGAION_DEBUG'):
             silent = False
 
         chroot = self._root
@@ -989,7 +989,7 @@ blacklist nouveau
         This function copy the LiveCD/DVD content into self._root
         """
 
-        if not os.getenv("SABAYON_DISABLE_PKG_REMOVAL"):
+        if not os.getenv("KOGAION_DISABLE_PKG_REMOVAL"):
             self._setup_packages_to_remove()
 
         action = _("System Installation")
@@ -1299,7 +1299,7 @@ blacklist nouveau
             return
         # disable by default, pkg.sabayon.org was always selected
         # as first, causing massive bandwidth usage
-        if not os.getenv('SABAYON_ENABLE_MIRROR_SORTING'):
+        if not os.getenv('KOGAION_ENABLE_MIRROR_SORTING'):
             return
 
         self._progress.set_label("%s: %s" % (
@@ -1327,7 +1327,7 @@ blacklist nouveau
             self._change_entropy_chroot(chroot)
 
         silent = True
-        if os.getenv('SABAYON_DEBUG'):
+        if os.getenv('KOGAION_DEBUG'):
             silent = False
         # XXX add stdout silence
         oldstdout = sys.stdout
