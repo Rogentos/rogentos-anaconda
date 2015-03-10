@@ -267,9 +267,9 @@ class LiveCDCopyBackend(backend.AnacondaBackend):
             "splash", "console=", "pci=routeirq", "irqpoll", "nohdparm", "pci=",
             "floppy.floppy=", "all-generic-ide", "gentoo=", "res=", "hsync=",
             "refresh=", "noddc", "xdriver=", "onlyvesa", "nvidia=", "dodmraid",
-            "dmraid", "sabayonmce", "steambox", "quiet", "scandelay=",
-            "doslowusb", "dokeymap", "keymap=", "radeon.modeset=",
-            "modeset=", "nomodeset", "domdadm", "dohyperv", "dovirtio"]
+            "dmraid", "quiet", "scandelay=", "doslowusb", "dokeymap", "keymap=",
+            "radeon.modeset=", "modeset=", "nomodeset", "domdadm", "dohyperv", 
+            "dovirtio"]
 
         # use reference, yeah
         cmdline = self._sabayon_install.cmdline
